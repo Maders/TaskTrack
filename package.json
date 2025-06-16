@@ -15,9 +15,12 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/swagger": "^11.2.0",
     "axios": "^1.6.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.25.65",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -47,6 +50,7 @@
     "@swc/helpers": "~0.5.11",
     "@types/jest": "^29.5.12",
     "@types/node": "18.16.9",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/utils": "^8.29.0",
     "angular-eslint": "^20.0.0",
     "cypress": "^14.2.1",
@@ -64,6 +68,7 @@
     "tslib": "^2.3.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
+    "uuid": "^11.1.0",
     "webpack-cli": "^5.1.4"
   }
 }
