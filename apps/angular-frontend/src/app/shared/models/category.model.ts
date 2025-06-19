@@ -6,10 +6,10 @@ export interface Category {
 
 export interface CreateCategoryDto {
   title: string;
-  description?: string;
+  description: string | null;
 }
 
 export interface UpdateCategoryDto {
   title?: string;
-  description?: string;
+  description?: string | null;
 }

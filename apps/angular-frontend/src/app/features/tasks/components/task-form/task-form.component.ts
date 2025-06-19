@@ -23,6 +23,10 @@ import {
 } from '../../../../shared/models/task.model';
 import { Category } from '../../../../shared/models/category.model';
 import { CategoryService } from '../../../../core/services/category.service';
+import {
+  ErrorHandlerService,
+  FormValidationErrors,
+} from '../../../../core/services/error-handler.service';
 
 @Component({
   selector: 'app-task-form',
@@ -34,6 +38,31 @@ import { CategoryService } from '../../../../core/services/category.service';
         <h2 class="text-lg font-medium text-gray-900">
           {{ isEditMode() ? 'Edit Task' : 'Create New Task' }}
         </h2>
+      </div>
+
+      <!-- General Error Message -->
+      <div
+        *ngIf="generalError()"
+        class="px-6 py-3 bg-red-50 border-b border-red-200"
+      >
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-red-800">{{ generalError() }}</p>
+          </div>
+        </div>
       </div>
 
       <form
@@ -51,11 +80,20 @@ import { CategoryService } from '../../../../core/services/category.service';
             type="text"
             formControlName="title"
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500 focus:border-red-500':
+                hasFieldError('title')
+            }"
             placeholder="Enter task title"
           />
+          <div *ngIf="getFieldError('title')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('title') }}
+          </div>
           <div
             *ngIf="
-              taskForm.get('title')?.invalid && taskForm.get('title')?.touched
+              taskForm.get('title')?.invalid &&
+              taskForm.get('title')?.touched &&
+              !getFieldError('title')
             "
             class="mt-1 text-sm text-red-600"
           >
@@ -63,7 +101,7 @@ import { CategoryService } from '../../../../core/services/category.service';
               >Title is required</span
             >
             <span *ngIf="taskForm.get('title')?.errors?.['minlength']"
-              >Title must be at least 3 characters</span
+              >Title must be at least 5 characters</span
             >
           </div>
         </div>
@@ -80,8 +118,18 @@ import { CategoryService } from '../../../../core/services/category.service';
             formControlName="description"
             rows="3"
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500 focus:border-red-500':
+                hasFieldError('description')
+            }"
             placeholder="Enter task description"
           ></textarea>
+          <div
+            *ngIf="getFieldError('description')"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ getFieldError('description') }}
+          </div>
         </div>
 
         <!-- Status -->
@@ -93,6 +141,10 @@ import { CategoryService } from '../../../../core/services/category.service';
             id="status"
             formControlName="status"
             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500 focus:border-red-500':
+                hasFieldError('status')
+            }"
           >
             <option value="">Select status</option>
             <option value="To Do">To Do</option>
@@ -100,8 +152,16 @@ import { CategoryService } from '../../../../core/services/category.service';
             <option value="Done">Done</option>
           </select>
           <div
+            *ngIf="getFieldError('status')"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ getFieldError('status') }}
+          </div>
+          <div
             *ngIf="
-              taskForm.get('status')?.invalid && taskForm.get('status')?.touched
+              taskForm.get('status')?.invalid &&
+              taskForm.get('status')?.touched &&
+              !getFieldError('status')
             "
             class="mt-1 text-sm text-red-600"
           >
@@ -118,10 +178,20 @@ import { CategoryService } from '../../../../core/services/category.service';
           >
           <input
             id="dueDate"
-            type="date"
+            type="datetime-local"
             formControlName="dueDate"
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500 focus:border-red-500':
+                hasFieldError('dueDate')
+            }"
           />
+          <div
+            *ngIf="getFieldError('dueDate')"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ getFieldError('dueDate') }}
+          </div>
         </div>
 
         <!-- Category -->
@@ -135,12 +205,22 @@ import { CategoryService } from '../../../../core/services/category.service';
             id="categoryId"
             formControlName="categoryId"
             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            [ngClass]="{
+              'border-red-300 focus:ring-red-500 focus:border-red-500':
+                hasFieldError('categoryId')
+            }"
           >
             <option value="">Select category</option>
             <option *ngFor="let category of categories()" [value]="category.id">
               {{ category.title }}
             </option>
           </select>
+          <div
+            *ngIf="getFieldError('categoryId')"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ getFieldError('categoryId') }}
+          </div>
         </div>
 
         <!-- Form Actions -->
@@ -178,17 +258,20 @@ import { CategoryService } from '../../../../core/services/category.service';
   ],
 })
 export class TaskFormComponent implements OnInit {
-  @Input() task?: Task;
+  @Input() task?: Task | null;
   @Output() taskSaved = new EventEmitter<CreateTaskDto | UpdateTaskDto>();
   @Output() cancelled = new EventEmitter<void>();
 
   private categoryService = inject(CategoryService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private errorHandler = inject(ErrorHandlerService);
 
   // Signals
   loading = signal(false);
   categories = signal<Category[]>([]);
+  generalError = signal<string>('');
+  validationErrors = signal<FormValidationErrors>({});
 
   // Form
   taskForm: FormGroup;
@@ -196,7 +279,7 @@ export class TaskFormComponent implements OnInit {
 
   constructor() {
     this.taskForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
+      title: ['', [Validators.required, Validators.minLength(5)]],
       description: [''],
       status: ['', Validators.required],
       dueDate: [''],
@@ -238,20 +321,23 @@ export class TaskFormComponent implements OnInit {
 
   private formatDateForInput(dateString: string): string {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return date.toISOString().slice(0, 16); // Format for datetime-local input
   }
 
   onSubmit(): void {
     if (this.taskForm.valid) {
       this.loading.set(true);
+      this.clearErrors();
 
       const formValue = this.taskForm.value;
       const taskData: CreateTaskDto | UpdateTaskDto = {
         title: formValue.title,
-        description: formValue.description || undefined,
+        description: formValue.description || null,
         status: formValue.status,
-        dueDate: formValue.dueDate || undefined,
-        categoryId: formValue.categoryId || undefined,
+        dueDate: formValue.dueDate
+          ? new Date(formValue.dueDate).toISOString()
+          : null,
+        categoryId: formValue.categoryId || null,
       };
 
       this.taskSaved.emit(taskData);
@@ -263,6 +349,30 @@ export class TaskFormComponent implements OnInit {
 
   onCancel(): void {
     this.cancelled.emit();
+  }
+
+  // Error handling methods
+  setValidationErrors(errors: FormValidationErrors): void {
+    this.validationErrors.set(errors);
+
+    // Set general error if exists
+    if (errors['general']) {
+      this.generalError.set(errors['general'].serverError);
+    }
+  }
+
+  clearErrors(): void {
+    this.generalError.set('');
+    this.validationErrors.set({});
+  }
+
+  hasFieldError(fieldName: string): boolean {
+    return !!this.getFieldError(fieldName);
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const errors = this.validationErrors();
+    return errors[fieldName]?.serverError || null;
   }
 
   private markFormGroupTouched(): void {

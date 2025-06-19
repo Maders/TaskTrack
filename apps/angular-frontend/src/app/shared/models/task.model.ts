@@ -9,18 +9,18 @@ export interface Task {
 
 export interface CreateTaskDto {
   title: string;
-  description?: string;
-  dueDate?: string;
+  description: string | null;
+  dueDate: string | null;
   status: 'To Do' | 'In Progress' | 'Done';
-  categoryId?: string;
+  categoryId: string | null;
 }
 
 export interface UpdateTaskDto {
   title?: string;
-  description?: string;
-  dueDate?: string;
+  description?: string | null;
+  dueDate?: string | null;
   status?: 'To Do' | 'In Progress' | 'Done';
-  categoryId?: string;
+  categoryId?: string | null;
 }
 
 export interface TaskFilters {
