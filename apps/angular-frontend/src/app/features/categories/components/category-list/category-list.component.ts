@@ -359,7 +359,7 @@ export class CategoryListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading categories:', error);
-        this.toastService.show('Failed to load categories', 'error');
+        this.toastService.error('Failed to load categories');
         this.loading.set(false);
       },
     });
@@ -372,6 +372,7 @@ export class CategoryListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading task counts:', error);
+        this.toastService.error('Failed to load task counts');
       },
     });
   }
@@ -433,7 +434,7 @@ export class CategoryListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error deleting category:', error);
-          this.toastService.show('Failed to delete category', 'error');
+          this.toastService.error('Failed to delete category');
         },
       });
     }

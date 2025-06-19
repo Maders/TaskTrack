@@ -122,13 +122,22 @@ export class CategoryCreatePageComponent {
         error: (error) => {
           console.error('Error creating category:', error);
           const validationErrors = this.errorHandler.handleError(error);
-          // The form component will handle displaying the errors
-          // We just need to pass them to the form
-          const formComponent = document.querySelector(
-            'app-category-form'
-          ) as any;
-          if (formComponent && formComponent.setValidationErrors) {
-            formComponent.setValidationErrors(validationErrors);
+
+          if (validationErrors.validationErrors) {
+            // The form component will handle displaying the errors
+            const formComponent = document.querySelector(
+              'app-category-form'
+            ) as any;
+            if (formComponent && formComponent.setValidationErrors) {
+              formComponent.setValidationErrors(
+                validationErrors.validationErrors
+              );
+            }
+          } else {
+            // Show general error toast
+            this.toastService.error(
+              validationErrors.message || 'Failed to create category'
+            );
           }
         },
       });

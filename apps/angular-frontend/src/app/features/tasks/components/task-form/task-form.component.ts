@@ -27,6 +27,7 @@ import {
   ErrorHandlerService,
   FormValidationErrors,
 } from '../../../../core/services/error-handler.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-task-form',
@@ -263,9 +264,8 @@ export class TaskFormComponent implements OnInit {
   @Output() cancelled = new EventEmitter<void>();
 
   private categoryService = inject(CategoryService);
-  private router = inject(Router);
   private fb = inject(FormBuilder);
-  private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
 
   // Signals
   loading = signal(false);
@@ -315,7 +315,10 @@ export class TaskFormComponent implements OnInit {
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (result) => this.categories.set(result.categories),
-      error: (error) => console.error('Error loading categories:', error),
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.toastService.error('Failed to load categories');
+      },
     });
   }
 

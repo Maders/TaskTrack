@@ -535,6 +535,7 @@ export class TaskListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading tasks:', error);
+          this.toastService.error('Failed to load tasks');
           this.loading.set(false);
         },
       });
@@ -543,7 +544,10 @@ export class TaskListComponent implements OnInit {
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (result) => this.categories.set(result.categories),
-      error: (error) => console.error('Error loading categories:', error),
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.toastService.error('Failed to load categories');
+      },
     });
   }
 
@@ -579,10 +583,11 @@ export class TaskListComponent implements OnInit {
       this.taskService.deleteTask(id).subscribe({
         next: () => {
           this.loadTasks();
+          this.toastService.success('Task deleted successfully');
         },
         error: (error) => {
           console.error('Error deleting task:', error);
-          alert('Failed to delete task');
+          this.toastService.error('Failed to delete task');
         },
       });
     }
@@ -625,7 +630,7 @@ export class TaskListComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error assigning category:', error);
-          alert('Failed to assign category');
+          this.toastService.error('Failed to assign category');
         },
       });
   }

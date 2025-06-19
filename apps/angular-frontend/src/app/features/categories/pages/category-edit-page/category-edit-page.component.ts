@@ -181,7 +181,10 @@ export class CategoryEditPageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading category:', error);
-        this.error.set('Failed to load category. Please try again.');
+        const errorResult = this.errorHandler.handleError(error);
+        this.error.set(
+          errorResult.message || 'Failed to load category. Please try again.'
+        );
         this.loading.set(false);
       },
     });
@@ -190,7 +193,7 @@ export class CategoryEditPageComponent implements OnInit {
   onCategorySaved(categoryData: UpdateCategoryDto | any): void {
     const categoryId = this.route.snapshot.paramMap.get('id');
     if (!categoryId) {
-      this.toastService.show('Category ID is required', 'error');
+      this.toastService.error('Category ID is required');
       return;
     }
 
@@ -209,12 +212,22 @@ export class CategoryEditPageComponent implements OnInit {
         error: (error) => {
           console.error('Error updating category:', error);
           const validationErrors = this.errorHandler.handleError(error);
-          // The form component will handle displaying the errors
-          const formComponent = document.querySelector(
-            'app-category-form'
-          ) as any;
-          if (formComponent && formComponent.setValidationErrors) {
-            formComponent.setValidationErrors(validationErrors);
+
+          if (validationErrors.validationErrors) {
+            // The form component will handle displaying the errors
+            const formComponent = document.querySelector(
+              'app-category-form'
+            ) as any;
+            if (formComponent && formComponent.setValidationErrors) {
+              formComponent.setValidationErrors(
+                validationErrors.validationErrors
+              );
+            }
+          } else {
+            // Show general error toast
+            this.toastService.error(
+              validationErrors.message || 'Failed to update category'
+            );
           }
         },
       });
