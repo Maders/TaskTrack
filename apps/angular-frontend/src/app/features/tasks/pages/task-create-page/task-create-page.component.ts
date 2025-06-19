@@ -64,14 +64,26 @@ export class TaskCreatePageComponent {
         const errorResult = this.errorHandler.handleError(error);
 
         if (errorResult.validationErrors) {
+          // Show toast for validation errors
+          const errorMessages = Object.values(errorResult.validationErrors)
+            .map((err) => err.serverError)
+            .filter((msg) => msg)
+            .join(', ');
+
+          if (errorMessages) {
+            this.toastService.error(`Validation failed: ${errorMessages}`);
+          }
+
           // Pass validation errors to the form component
           const taskFormComponent = (this as any).taskForm;
           if (taskFormComponent && taskFormComponent.setValidationErrors) {
             taskFormComponent.setValidationErrors(errorResult.validationErrors);
           }
         } else {
-          // Handle general errors (you might want to show a toast notification)
-          console.error('General error:', errorResult.message);
+          // Handle general errors with toast
+          this.toastService.error(
+            errorResult.message || 'Failed to create task'
+          );
         }
       },
     });

@@ -132,6 +132,16 @@ export class TaskEditPageComponent implements OnInit {
         const errorResult = this.errorHandler.handleError(error);
 
         if (errorResult.validationErrors) {
+          // Show toast for validation errors
+          const errorMessages = Object.values(errorResult.validationErrors)
+            .map((err) => err.serverError)
+            .filter((msg) => msg)
+            .join(', ');
+
+          if (errorMessages) {
+            this.toastService.error(`Validation failed: ${errorMessages}`);
+          }
+
           // Pass validation errors to the form component
           const taskFormComponent = (this as any).taskForm;
           if (taskFormComponent && taskFormComponent.setValidationErrors) {
@@ -139,7 +149,9 @@ export class TaskEditPageComponent implements OnInit {
           }
         } else {
           // Show general error toast
-          this.toastService.error(errorResult.message);
+          this.toastService.error(
+            errorResult.message || 'Failed to update task'
+          );
         }
       },
     });
