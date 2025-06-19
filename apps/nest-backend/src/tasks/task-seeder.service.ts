@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
 import { AbstractTaskRepository } from './interfaces/task.repository.interface';
-import { AbstractCategoriesService } from '../categories/interfaces/categories.service.interface';
-import { CreateTaskDto } from './dto/create-task.dto';
 import { AbstractCategoryRepository } from '../categories/interfaces/category.repository.interface';
 import { Category } from '../categories/entities/category.entity';
 
@@ -10,7 +8,6 @@ import { Category } from '../categories/entities/category.entity';
 export class TaskSeederService {
   constructor(
     private readonly taskRepository: AbstractTaskRepository,
-    private readonly categoriesService: AbstractCategoriesService,
     private readonly categoryRepository: AbstractCategoryRepository
   ) {}
 
@@ -88,58 +85,5 @@ export class TaskSeederService {
     } catch (error) {
       console.error('Error seeding tasks:', error);
     }
-  }
-
-  private generateTaskTitle(): string {
-    const taskTypes = [
-      'Complete',
-      'Review',
-      'Implement',
-      'Design',
-      'Test',
-      'Deploy',
-      'Update',
-      'Fix',
-      'Create',
-      'Analyze',
-      'Optimize',
-      'Refactor',
-      'Document',
-      'Configure',
-      'Setup',
-    ];
-
-    const subjects = [
-      'user authentication system',
-      'database schema',
-      'API endpoints',
-      'frontend components',
-      'unit tests',
-      'integration tests',
-      'deployment pipeline',
-      'monitoring dashboard',
-      'error handling',
-      'performance optimization',
-      'security audit',
-      'code documentation',
-      'user interface design',
-      'data migration script',
-      'third-party integration',
-      'mobile app features',
-      'admin panel',
-      'reporting system',
-      'notification service',
-      'caching layer',
-      'search functionality',
-      'payment processing',
-      'email templates',
-      'analytics tracking',
-      'backup system',
-    ];
-
-    const taskType = faker.helpers.arrayElement(taskTypes);
-    const subject = faker.helpers.arrayElement(subjects);
-
-    return `${taskType} ${subject}`;
   }
 }

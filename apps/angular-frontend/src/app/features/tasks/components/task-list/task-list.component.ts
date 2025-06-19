@@ -1,16 +1,9 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  signal,
-  effect,
-  Input,
-} from '@angular/core';
+import { Component, OnInit, inject, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
-import { Subject, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 
 import { Task, TaskFilters } from '../../../../shared/models/task.model';
 import { TaskService } from '../../../../core/services/task.service';
@@ -431,7 +424,6 @@ export class TaskListComponent implements OnInit {
 
   // Form
   filterForm: FormGroup;
-  private filterSubject = new Subject<TaskFilters>();
 
   // Computed
   Math = Math;
