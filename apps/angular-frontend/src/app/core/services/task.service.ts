@@ -34,7 +34,9 @@ export class TaskService {
   // Get all tasks with optional filters and pagination
   getTasks(
     filters?: TaskFilters,
-    pagination?: { page: number; limit: number }
+    pagination?: { page: number; limit: number },
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
   ): Observable<{ tasks: Task[]; pagination: TaskPagination }> {
     let params = new HttpParams();
 
@@ -57,6 +59,14 @@ export class TaskService {
     if (pagination) {
       params = params.set('page', pagination.page.toString());
       params = params.set('limit', pagination.limit.toString());
+    }
+
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+    }
+
+    if (sortOrder) {
+      params = params.set('sortOrder', sortOrder);
     }
 
     return this.http.get<TaskListResponse>(this.apiUrl, { params }).pipe(

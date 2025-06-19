@@ -3,6 +3,7 @@ export interface Category {
   title: string;
   description: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCategoryDto {

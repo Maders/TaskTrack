@@ -9,9 +9,12 @@ export class InMemoryCategoryRepository implements AbstractCategoryRepository {
   private categories: Category[] = [];
 
   create(category: CreateCategoryDto): Category {
+    const now = new Date().toISOString();
     const newCategory: Category = {
       id: uuidv4(),
       ...category,
+      createdAt: now,
+      updatedAt: now,
     };
     this.categories.push(newCategory);
     return newCategory;
@@ -22,14 +25,18 @@ export class InMemoryCategoryRepository implements AbstractCategoryRepository {
   }
 
   findById(id: string): Category | undefined {
-    console.log('categories:', this.categories);
     return this.categories.find((c) => c.id === id);
   }
 
   update(id: string, update: Partial<Category>): Category | undefined {
     const index = this.categories.findIndex((c) => c.id === id);
     if (index === -1) return undefined;
-    this.categories[index] = { ...this.categories[index], ...update };
+
+    this.categories[index] = {
+      ...this.categories[index],
+      ...update,
+      updatedAt: new Date().toISOString(), // Always update the updatedAt timestamp
+    };
     return this.categories[index];
   }
 

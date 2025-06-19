@@ -48,8 +48,17 @@ export class CategoriesService implements AbstractCategoriesService {
         let bValue: any = b[sorting.sortBy as keyof typeof b];
 
         if (typeof aValue === 'string') {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
+          // For date fields, convert to Date objects for proper comparison
+          if (
+            sorting.sortBy === 'createdAt' ||
+            sorting.sortBy === 'updatedAt'
+          ) {
+            aValue = new Date(aValue).getTime();
+            bValue = new Date(bValue).getTime();
+          } else {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+          }
         }
 
         if (sorting.sortOrder === 'asc') {

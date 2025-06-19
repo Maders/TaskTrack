@@ -14,9 +14,12 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
   private tasks: Task[] = [];
 
   create(task: CreateTaskDto): Task {
+    const now = new Date().toISOString();
     const newTask: Task = {
       id: uuidv4(),
       ...task,
+      createdAt: now,
+      updatedAt: now,
     };
 
     this.tasks.push(newTask);
@@ -44,6 +47,46 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
         filteredTasks = filteredTasks.filter((task) =>
           task.title.toLowerCase().includes(filters.title!.toLowerCase())
         );
+      }
+
+      // Apply sorting
+      if (filters.sortBy && filters.sortOrder) {
+        filteredTasks.sort((a, b) => {
+          let aValue: any;
+          let bValue: any;
+
+          switch (filters.sortBy) {
+            case 'title':
+              aValue = a.title.toLowerCase();
+              bValue = b.title.toLowerCase();
+              break;
+            case 'status':
+              aValue = a.status;
+              bValue = b.status;
+              break;
+            case 'dueDate':
+              aValue = a.dueDate || '';
+              bValue = b.dueDate || '';
+              break;
+            case 'createdAt':
+              aValue = a.createdAt;
+              bValue = b.createdAt;
+              break;
+            case 'updatedAt':
+              aValue = a.updatedAt;
+              bValue = b.updatedAt;
+              break;
+            default:
+              aValue = a.createdAt;
+              bValue = b.createdAt;
+          }
+
+          if (filters.sortOrder === 'asc') {
+            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+          } else {
+            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+          }
+        });
       }
     }
 
@@ -75,7 +118,12 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
   update(id: string, update: Partial<Task>): Task | undefined {
     const index = this.tasks.findIndex((t) => t.id === id);
     if (index === -1) return undefined;
-    this.tasks[index] = { ...this.tasks[index], ...update };
+
+    this.tasks[index] = {
+      ...this.tasks[index],
+      ...update,
+      updatedAt: new Date().toISOString(), // Always update the updatedAt timestamp
+    };
     return this.tasks[index];
   }
 

@@ -55,7 +55,11 @@ export class CategoriesController {
     summary: 'Get all categories with optional filtering and pagination',
   })
   @ApiQuery({ name: 'title', required: false, type: String })
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['title', 'createdAt'] })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['title', 'createdAt', 'updatedAt'],
+  })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })

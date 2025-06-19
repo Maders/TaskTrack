@@ -53,7 +53,7 @@ import { Category } from '../../../../shared/models/category.model';
       <div class="px-6 py-4 border-b border-gray-200">
         <form
           [formGroup]="filterForm"
-          class="grid grid-cols-1 md:grid-cols-4 gap-4"
+          class="grid grid-cols-1 md:grid-cols-6 gap-4"
         >
           <div>
             <label for="status" class="block text-sm font-medium text-gray-700"
@@ -103,6 +103,39 @@ import { Category } from '../../../../shared/models/category.model';
               placeholder="Search tasks..."
               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
+          </div>
+
+          <div>
+            <label for="sortBy" class="block text-sm font-medium text-gray-700"
+              >Sort By</label
+            >
+            <select
+              id="sortBy"
+              formControlName="sortBy"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="createdAt">Created Date</option>
+              <option value="updatedAt">Updated Date</option>
+              <option value="title">Title</option>
+              <option value="status">Status</option>
+              <option value="dueDate">Due Date</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="sortOrder"
+              class="block text-sm font-medium text-gray-700"
+              >Order</label
+            >
+            <select
+              id="sortOrder"
+              formControlName="sortOrder"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
+            </select>
           </div>
 
           <div class="flex items-end">
@@ -275,6 +308,8 @@ export class TaskListComponent implements OnInit {
   pageSize = signal(10);
   totalTasks = signal(0);
   totalPages = signal(0);
+  sortBy = signal('createdAt');
+  sortOrder = signal<'asc' | 'desc'>('desc');
 
   // Form
   filterForm: FormGroup;
@@ -288,6 +323,8 @@ export class TaskListComponent implements OnInit {
       status: [''],
       categoryId: [''],
       title: [''],
+      sortBy: ['createdAt'],
+      sortOrder: ['desc'],
     });
   }
 
@@ -314,7 +351,11 @@ export class TaskListComponent implements OnInit {
       this.filterForm
         .get('title')!
         .valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
-    ]).subscribe(([status, categoryId, title]) => {
+      this.filterForm.get('sortBy')!.valueChanges.pipe(distinctUntilChanged()),
+      this.filterForm
+        .get('sortOrder')!
+        .valueChanges.pipe(distinctUntilChanged()),
+    ]).subscribe(([status, categoryId, title, sortBy, sortOrder]) => {
       this.currentPage.set(1);
       this.loadTasks(); // Actually load tasks when filters change
     });
@@ -326,6 +367,8 @@ export class TaskListComponent implements OnInit {
     const statusValue = this.filterForm.get('status')?.value;
     const categoryValue = this.filterForm.get('categoryId')?.value;
     const titleValue = this.filterForm.get('title')?.value;
+    const sortByValue = this.filterForm.get('sortBy')?.value;
+    const sortOrderValue = this.filterForm.get('sortOrder')?.value;
 
     const filters: TaskFilters = {
       status:
@@ -338,10 +381,15 @@ export class TaskListComponent implements OnInit {
     };
 
     this.taskService
-      .getTasks(filters, {
-        page: this.currentPage(),
-        limit: this.pageSize(),
-      })
+      .getTasks(
+        filters,
+        {
+          page: this.currentPage(),
+          limit: this.pageSize(),
+        },
+        sortByValue,
+        sortOrderValue
+      )
       .subscribe({
         next: (result) => {
           this.tasks.set(result.tasks);

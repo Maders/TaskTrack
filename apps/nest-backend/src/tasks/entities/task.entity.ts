@@ -27,4 +27,16 @@ export class Task {
     description: 'The ID of the category this task belongs to',
   })
   categoryId: string | null;
+
+  @ApiProperty({
+    description: 'The date when the task was created',
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  createdAt: string;
+
+  @ApiProperty({
+    description: 'The date when the task was last updated',
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  updatedAt: string;
 }

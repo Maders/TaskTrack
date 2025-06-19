@@ -5,6 +5,8 @@ export interface TaskFilters {
   status?: string;
   categoryId?: string;
   title?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface TaskPagination {

@@ -97,6 +97,7 @@ import { ToastService } from '../../../../core/services/toast.service';
             >
               <option value="title">Title</option>
               <option value="createdAt">Created Date</option>
+              <option value="updatedAt">Updated Date</option>
             </select>
             <button
               (click)="toggleSortOrder()"

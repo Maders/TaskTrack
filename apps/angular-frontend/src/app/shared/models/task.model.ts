@@ -5,6 +5,8 @@ export interface Task {
   dueDate: string | null;
   status: 'To Do' | 'In Progress' | 'Done';
   categoryId: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTaskDto {
@@ -31,6 +33,8 @@ export interface TaskFilters {
   };
   title?: string;
   categoryId?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface TaskPagination {

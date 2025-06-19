@@ -61,6 +61,8 @@ export class TasksController {
   @ApiQuery({ name: 'title', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   @ApiResponse({
     status: 200,
     description: 'Return filtered tasks.',
@@ -71,12 +73,16 @@ export class TasksController {
     @Query('categoryId') categoryId?: string,
     @Query('title') title?: string,
     @Query('page') page?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc'
   ) {
     const filters = {
       status: status || undefined,
       categoryId: categoryId || undefined,
       title: title || undefined,
+      sortBy: sortBy || undefined,
+      sortOrder: sortOrder || undefined,
     };
 
     const pagination = {
