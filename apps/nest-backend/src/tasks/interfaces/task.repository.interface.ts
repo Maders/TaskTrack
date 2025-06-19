@@ -5,6 +5,8 @@ export interface TaskFilters {
   status?: string;
   categoryId?: string;
   title?: string;
+  dateRangeStart?: string;
+  dateRangeEnd?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -26,12 +28,8 @@ export interface TaskListResult {
 
 export abstract class AbstractTaskRepository {
   abstract create(task: CreateTaskDto): Task;
-  abstract findAll(
-    filters?: TaskFilters,
-    pagination?: TaskPagination
-  ): TaskListResult;
+  abstract findAll(): Task[];
   abstract findById(id: string): Task | undefined;
   abstract update(id: string, update: Partial<Task>): Task | undefined;
   abstract delete(id: string): void;
-  abstract findAllWithoutPagination(filters?: TaskFilters): Task[];
 }

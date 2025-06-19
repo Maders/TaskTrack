@@ -18,7 +18,7 @@ export class TaskSeederService {
     try {
       // Check if tasks already exist
       const existingTasks = this.taskRepository.findAll();
-      if (existingTasks.tasks.length > 0) {
+      if (existingTasks.length > 0) {
         console.log('Tasks already exist, skipping seeding...');
         return;
       }

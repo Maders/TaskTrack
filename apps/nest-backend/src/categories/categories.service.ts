@@ -100,8 +100,8 @@ export class CategoriesService implements AbstractCategoriesService {
 
   remove(id: string): CategoryDeletionResult {
     // Find all tasks associated with this category
-    const tasksResult = this.taskRepository.findAll({ categoryId: id });
-    const affectedTasks = tasksResult.tasks;
+    const allTasks = this.taskRepository.findAll();
+    const affectedTasks = allTasks.filter((task) => task.categoryId === id);
 
     // Set categoryId to null for all affected tasks
     affectedTasks.forEach((task) => {
@@ -119,7 +119,7 @@ export class CategoriesService implements AbstractCategoriesService {
   }
 
   getTaskCountsByCategory(): Record<string, number> {
-    const tasks = this.taskRepository.findAllWithoutPagination();
+    const tasks = this.taskRepository.findAll();
     const taskCounts: Record<string, number> = {};
 
     tasks.forEach((task) => {
