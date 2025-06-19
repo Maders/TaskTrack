@@ -31,7 +31,6 @@ export class TaskService {
 
   private http = inject(HttpClient);
 
-  // Get all tasks with optional filters and pagination
   getTasks(
     filters?: TaskFilters,
     pagination?: { page: number; limit: number },
@@ -83,12 +82,10 @@ export class TaskService {
     );
   }
 
-  // Get a single task by ID
   getTask(id: string): Observable<Task> {
     return this.http.get<Task>(`${this.apiUrl}/${id}`);
   }
 
-  // Create a new task
   createTask(task: CreateTaskDto): Observable<Task> {
     return this.http.post<Task>(this.apiUrl, task).pipe(
       tap((newTask) => {
@@ -98,7 +95,6 @@ export class TaskService {
     );
   }
 
-  // Update an existing task
   updateTask(id: string, task: UpdateTaskDto): Observable<Task> {
     return this.http.patch<Task>(`${this.apiUrl}/${id}`, task).pipe(
       tap((updatedTask) => {
@@ -111,7 +107,6 @@ export class TaskService {
     );
   }
 
-  // Delete a task
   deleteTask(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
@@ -122,14 +117,12 @@ export class TaskService {
     );
   }
 
-  // Get tasks by category
   getTasksByCategory(categoryId: string): Observable<Task[]> {
     return this.http
       .get<TaskListResponse>(`${this.apiUrl}?categoryId=${categoryId}`)
       .pipe(map((response) => response.tasks));
   }
 
-  // Update task status
   updateTaskStatus(
     id: string,
     status: 'To Do' | 'In Progress' | 'Done'
@@ -137,7 +130,6 @@ export class TaskService {
     return this.updateTask(id, { status });
   }
 
-  // Assign category to task
   assignCategory(taskId: string, categoryId: string | null): Observable<Task> {
     return this.updateTask(taskId, { categoryId });
   }

@@ -444,14 +444,13 @@ export class TaskListComponent implements OnInit {
     this.loadCategories();
     this.setupFilterSubscription();
 
-    // Apply initial filters if provided
     if (this.initialFilters.categoryId) {
       this.filterForm.patchValue({
         categoryId: this.initialFilters.categoryId,
       });
     }
 
-    this.loadTasks(); // Load initial tasks
+    this.loadTasks();
   }
 
   private setupFilterSubscription(): void {
@@ -484,7 +483,7 @@ export class TaskListComponent implements OnInit {
         dateRangeEnd,
       ]) => {
         this.currentPage.set(1);
-        this.loadTasks(); // Actually load tasks when filters change
+        this.loadTasks();
       }
     );
   }
@@ -604,14 +603,14 @@ export class TaskListComponent implements OnInit {
   previousPage(): void {
     if (this.currentPage() > 1) {
       this.currentPage.update((page) => page - 1);
-      this.loadTasks(); // Load tasks for the new page
+      this.loadTasks();
     }
   }
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((page) => page + 1);
-      this.loadTasks(); // Load tasks for the new page
+      this.loadTasks();
     }
   }
 

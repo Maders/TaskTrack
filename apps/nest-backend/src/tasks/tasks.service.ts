@@ -32,7 +32,6 @@ export class TasksService {
   findAll(filters?: TaskFilters, pagination?: TaskPagination): TaskListResult {
     let allTasks = this.taskRepository.findAll();
 
-    // Apply filters
     if (filters) {
       if (filters.status && filters.status.trim() !== '') {
         allTasks = allTasks.filter((task) => task.status === filters.status);
@@ -50,7 +49,6 @@ export class TasksService {
         );
       }
 
-      // Apply date range filter
       if (filters.dateRangeStart && filters.dateRangeEnd) {
         const startDate = new Date(filters.dateRangeStart);
         const endDate = new Date(filters.dateRangeEnd);
@@ -62,7 +60,6 @@ export class TasksService {
         });
       }
 
-      // Apply sorting
       if (filters.sortBy && filters.sortOrder) {
         allTasks.sort((a, b) => {
           let aValue: any;
@@ -108,7 +105,6 @@ export class TasksService {
     const limit = pagination?.limit || 10;
     const totalPages = Math.ceil(total / limit);
 
-    // Apply pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedTasks = allTasks.slice(startIndex, endIndex);

@@ -13,7 +13,6 @@ export class TaskSeederService {
 
   async seed(): Promise<void> {
     try {
-      // Check if tasks already exist
       const existingTasks = this.taskRepository.findAll();
       if (existingTasks.length > 0) {
         console.log('Tasks already exist, skipping seeding...');
@@ -22,14 +21,12 @@ export class TaskSeederService {
 
       console.log('Seeding tasks...');
 
-      // Get categories for task assignment
       const categories: Category[] = this.categoryRepository.findAll();
       console.log(
         'Available categories for seeding tasks:',
         categories.map((c) => ({ id: c.id, title: c.title }))
       );
 
-      // Create 15 tasks with 'To Do' status first
       for (let i = 1; i <= 15; i++) {
         const categoryId =
           (categories.length > 0 &&
@@ -55,7 +52,6 @@ export class TaskSeederService {
         this.taskRepository.create(task);
       }
 
-      // Create 30 more tasks with random statuses
       for (let i = 1; i <= 30; i++) {
         const categoryId =
           (categories.length > 0 &&

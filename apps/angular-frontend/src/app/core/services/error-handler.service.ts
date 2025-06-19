@@ -38,17 +38,15 @@ export class ErrorHandlerService {
   convertToFormErrors(validationError: ValidationError): FormValidationErrors {
     const formErrors: FormValidationErrors = {};
 
-    // Add field-specific errors
     Object.keys(validationError.fieldErrors).forEach((fieldName) => {
       const errors = validationError.fieldErrors[fieldName];
       if (errors && errors.length > 0) {
         formErrors[fieldName] = {
-          serverError: errors[0], // Take the first error message
+          serverError: errors[0],
         };
       }
     });
 
-    // Add general form errors
     if (validationError.formErrors && validationError.formErrors.length > 0) {
       formErrors['general'] = {
         serverError: validationError.formErrors[0],

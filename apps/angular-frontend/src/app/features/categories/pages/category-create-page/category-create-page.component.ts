@@ -108,7 +108,6 @@ export class CategoryCreatePageComponent {
   private errorHandler = inject(ErrorHandlerService);
 
   onCategorySaved(categoryData: CreateCategoryDto | any): void {
-    // Type guard to ensure we have a CreateCategoryDto
     if (categoryData && typeof categoryData.title === 'string') {
       const createData: CreateCategoryDto = {
         title: categoryData.title,

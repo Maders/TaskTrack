@@ -36,7 +36,7 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
     this.tasks[index] = {
       ...this.tasks[index],
       ...update,
-      updatedAt: new Date().toISOString(), // Always update the updatedAt timestamp
+      updatedAt: new Date().toISOString(),
     };
     return this.tasks[index];
   }

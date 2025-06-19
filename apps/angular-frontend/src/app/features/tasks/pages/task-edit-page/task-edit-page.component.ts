@@ -116,7 +116,6 @@ export class TaskEditPageComponent implements OnInit {
       return;
     }
 
-    // For edit page, we know it's an UpdateTaskDto
     const updateTaskData = taskData as UpdateTaskDto;
 
     this.taskService.updateTask(taskId, updateTaskData).subscribe({

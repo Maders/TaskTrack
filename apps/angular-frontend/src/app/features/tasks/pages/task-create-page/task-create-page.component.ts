@@ -48,7 +48,6 @@ export class TaskCreatePageComponent {
   private toastService = inject(ToastService);
 
   onTaskSaved(taskData: CreateTaskDto | UpdateTaskDto): void {
-    // For create page, we know it's a CreateTaskDto
     const createTaskData = taskData as CreateTaskDto;
 
     this.taskService.createTask(createTaskData).subscribe({

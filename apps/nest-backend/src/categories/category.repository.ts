@@ -35,7 +35,7 @@ export class InMemoryCategoryRepository implements AbstractCategoryRepository {
     this.categories[index] = {
       ...this.categories[index],
       ...update,
-      updatedAt: new Date().toISOString(), // Always update the updatedAt timestamp
+      updatedAt: new Date().toISOString(),
     };
     return this.categories[index];
   }

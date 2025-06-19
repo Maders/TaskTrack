@@ -32,7 +32,6 @@ export class CategoriesService implements AbstractCategoriesService {
   ): CategoryListResult {
     let categories = this.categoryRepository.findAll();
 
-    // Apply filters
     if (filters) {
       if (filters.title && filters.title.trim() !== '') {
         categories = categories.filter((category) =>
@@ -41,14 +40,12 @@ export class CategoriesService implements AbstractCategoriesService {
       }
     }
 
-    // Apply sorting
     if (sorting) {
       categories.sort((a, b) => {
         let aValue: any = a[sorting.sortBy as keyof typeof a];
         let bValue: any = b[sorting.sortBy as keyof typeof b];
 
         if (typeof aValue === 'string') {
-          // For date fields, convert to Date objects for proper comparison
           if (
             sorting.sortBy === 'createdAt' ||
             sorting.sortBy === 'updatedAt'
@@ -74,7 +71,6 @@ export class CategoriesService implements AbstractCategoriesService {
     const limit = pagination?.limit || 10;
     const totalPages = Math.ceil(total / limit);
 
-    // Apply pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedCategories = categories.slice(startIndex, endIndex);
@@ -99,19 +95,15 @@ export class CategoriesService implements AbstractCategoriesService {
   }
 
   remove(id: string): CategoryDeletionResult {
-    // Find all tasks associated with this category
     const allTasks = this.taskRepository.findAll();
     const affectedTasks = allTasks.filter((task) => task.categoryId === id);
 
-    // Set categoryId to null for all affected tasks
     affectedTasks.forEach((task) => {
       this.taskRepository.update(task.id, { categoryId: null });
     });
 
-    // Delete the category
     this.categoryRepository.delete(id);
 
-    // Return information about what was done
     return {
       message: `Category deleted successfully. ${affectedTasks.length} task(s) had their category unassigned.`,
       affectedTasksCount: affectedTasks.length,

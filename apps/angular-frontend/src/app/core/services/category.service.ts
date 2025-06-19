@@ -50,7 +50,6 @@ export class CategoryService {
 
   private http = inject(HttpClient);
 
-  // Get all categories with optional filters, sorting, and pagination
   getCategories(
     filters?: CategoryFilters,
     sorting?: CategorySorting,
@@ -88,12 +87,10 @@ export class CategoryService {
     );
   }
 
-  // Get a single category by ID
   getCategory(id: string): Observable<Category> {
     return this.http.get<Category>(`${this.apiUrl}/${id}`);
   }
 
-  // Create a new category
   createCategory(category: CreateCategoryDto): Observable<Category> {
     return this.http.post<Category>(this.apiUrl, category).pipe(
       tap((newCategory) => {
@@ -103,7 +100,6 @@ export class CategoryService {
     );
   }
 
-  // Update an existing category
   updateCategory(
     id: string,
     category: UpdateCategoryDto
@@ -119,7 +115,6 @@ export class CategoryService {
     );
   }
 
-  // Delete a category
   deleteCategory(id: string): Observable<CategoryDeletionResponse> {
     return this.http
       .delete<CategoryDeletionResponse>(`${this.apiUrl}/${id}`)
@@ -134,7 +129,6 @@ export class CategoryService {
       );
   }
 
-  // Get task counts by category
   getTaskCountsByCategory(): Observable<Record<string, number>> {
     return this.http.get<Record<string, number>>(`${this.apiUrl}/task-counts`);
   }
