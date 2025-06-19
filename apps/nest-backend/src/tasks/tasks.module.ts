@@ -5,6 +5,8 @@ import { InMemoryTaskRepository } from './task.repository';
 import { AbstractTaskRepository } from './interfaces/task.repository.interface';
 import { CategoriesModule } from '../categories/categories.module';
 import { TaskSeederService } from './task-seeder.service';
+import { InMemoryCategoryRepository } from '../categories/category.repository';
+import { AbstractCategoryRepository } from '../categories/interfaces/category.repository.interface';
 
 @Module({
   imports: [CategoriesModule],
@@ -14,6 +16,10 @@ import { TaskSeederService } from './task-seeder.service';
     {
       provide: AbstractTaskRepository,
       useClass: InMemoryTaskRepository,
+    },
+    {
+      provide: AbstractCategoryRepository,
+      useClass: InMemoryCategoryRepository,
     },
     TaskSeederService,
   ],

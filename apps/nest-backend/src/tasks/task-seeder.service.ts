@@ -3,19 +3,21 @@ import { faker } from '@faker-js/faker';
 import { AbstractTaskRepository } from './interfaces/task.repository.interface';
 import { AbstractCategoriesService } from '../categories/interfaces/categories.service.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { AbstractCategoryRepository } from '../categories/interfaces/category.repository.interface';
 
 @Injectable()
 export class TaskSeederService implements OnModuleInit {
   constructor(
     private readonly taskRepository: AbstractTaskRepository,
-    private readonly categoriesService: AbstractCategoriesService
+    private readonly categoriesService: AbstractCategoriesService,
+    private readonly categoryRepository: AbstractCategoryRepository
   ) {}
 
   async onModuleInit() {
-    await this.seedTasks();
+    await this.seed();
   }
 
-  private async seedTasks(): Promise<void> {
+  async seed(): Promise<void> {
     try {
       // Check if tasks already exist
       const existingTasks = this.taskRepository.findAll();
@@ -24,23 +26,26 @@ export class TaskSeederService implements OnModuleInit {
         return;
       }
 
+      console.log('Seeding tasks...');
+
       // Get categories for task assignment
-      const categories = this.categoriesService.findAll();
+      const categoriesResult = this.categoryRepository.findAll();
+      const categories = categoriesResult.categories;
 
-      // Ensure at least 15 'To Do' tasks
-      const tasks: CreateTaskDto[] = [];
-      for (let i = 0; i < 15; i++) {
-        tasks.push({
-          title: this.generateTaskTitle(),
+      // Create 15 tasks with 'To Do' status first
+      for (let i = 1; i <= 15; i++) {
+        const task = {
+          title: faker.lorem.sentence({ min: 5, max: 8 }),
           description:
             faker.helpers.maybe(() => faker.lorem.paragraph(), {
               probability: 0.7,
             }) || null,
-          status: 'To Do',
+          status: 'To Do' as const,
           dueDate:
-            faker.helpers.maybe(() => faker.date.future().toISOString(), {
-              probability: 0.6,
-            }) || null,
+            faker.helpers.maybe(
+              () => faker.date.future({ years: 1 }).toISOString(),
+              { probability: 0.6 }
+            ) || null,
           categoryId:
             categories.length > 0
               ? faker.helpers.maybe(
@@ -48,45 +53,40 @@ export class TaskSeederService implements OnModuleInit {
                   { probability: 0.8 }
                 ) || null
               : null,
-        });
-      }
+        };
 
-      // Add 30 more tasks with random statuses (total 45)
-      const statuses: ('To Do' | 'In Progress' | 'Done')[] = [
-        'To Do',
-        'In Progress',
-        'Done',
-      ];
-      for (let i = 0; i < 30; i++) {
-        tasks.push({
-          title: this.generateTaskTitle(),
-          description:
-            faker.helpers.maybe(() => faker.lorem.paragraph(), {
-              probability: 0.7,
-            }) || null,
-          status: faker.helpers.arrayElement(statuses),
-          dueDate:
-            faker.helpers.maybe(() => faker.date.future().toISOString(), {
-              probability: 0.6,
-            }) || null,
-          categoryId:
-            categories.length > 0
-              ? faker.helpers.maybe(
-                  () => faker.helpers.arrayElement(categories).id,
-                  { probability: 0.8 }
-                ) || null
-              : null,
-        });
-      }
-
-      // Create tasks
-      tasks.forEach((task) => {
         this.taskRepository.create(task);
-      });
+      }
 
-      console.log(`✅ Successfully seeded ${tasks.length} tasks`);
+      // Create 30 more tasks with random statuses
+      for (let i = 1; i <= 30; i++) {
+        const task = {
+          title: faker.lorem.sentence({ min: 5, max: 8 }),
+          description:
+            faker.helpers.maybe(() => faker.lorem.paragraph(), {
+              probability: 0.7,
+            }) || null,
+          status: faker.helpers.arrayElement(['To Do', 'In Progress', 'Done']),
+          dueDate:
+            faker.helpers.maybe(
+              () => faker.date.future({ years: 1 }).toISOString(),
+              { probability: 0.6 }
+            ) || null,
+          categoryId:
+            categories.length > 0
+              ? faker.helpers.maybe(
+                  () => faker.helpers.arrayElement(categories).id,
+                  { probability: 0.8 }
+                ) || null
+              : null,
+        };
+
+        this.taskRepository.create(task);
+      }
+
+      console.log('Tasks seeded successfully!');
     } catch (error) {
-      console.error('❌ Error seeding tasks:', error);
+      console.error('Error seeding tasks:', error);
     }
   }
 

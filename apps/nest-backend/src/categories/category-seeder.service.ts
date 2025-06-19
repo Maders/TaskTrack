@@ -9,64 +9,38 @@ export class CategorySeederService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedCategories();
+    await this.seed();
   }
 
-  private async seedCategories(): Promise<void> {
+  async seed(): Promise<void> {
     try {
       // Check if categories already exist
       const existingCategories = this.categoryRepository.findAll();
-      if (existingCategories.length > 0) {
+      if (existingCategories.categories.length > 0) {
         console.log('Categories already exist, skipping seeding...');
         return;
       }
 
-      // Default categories
-      const defaultCategories: CreateCategoryDto[] = [
-        {
-          title: 'Work',
-          description: 'Tasks related to work and professional development',
-        },
-        {
-          title: 'Personal',
-          description: 'Personal tasks and life management',
-        },
+      console.log('Seeding categories...');
+
+      const defaultCategories = [
+        { title: 'Work', description: 'Work-related tasks and projects' },
+        { title: 'Personal', description: 'Personal tasks and activities' },
+        { title: 'Shopping', description: 'Shopping lists and errands' },
+        { title: 'Health', description: 'Health and fitness related tasks' },
         {
           title: 'Learning',
-          description: 'Educational tasks and skill development',
-        },
-        {
-          title: 'Health',
-          description: 'Health and fitness related tasks',
-        },
-        {
-          title: 'Finance',
-          description: 'Financial planning and money management',
-        },
-        {
-          title: 'Home',
-          description: 'Household tasks and maintenance',
-        },
-        {
-          title: 'Travel',
-          description: 'Travel planning and arrangements',
-        },
-        {
-          title: 'Shopping',
-          description: 'Shopping lists and purchases',
+          description: 'Educational and learning activities',
         },
       ];
 
-      // Create categories
-      defaultCategories.forEach((category) => {
+      for (const category of defaultCategories) {
         this.categoryRepository.create(category);
-      });
+      }
 
-      console.log(
-        `✅ Successfully seeded ${defaultCategories.length} categories`
-      );
+      console.log('Categories seeded successfully!');
     } catch (error) {
-      console.error('❌ Error seeding categories:', error);
+      console.error('Error seeding categories:', error);
     }
   }
 }

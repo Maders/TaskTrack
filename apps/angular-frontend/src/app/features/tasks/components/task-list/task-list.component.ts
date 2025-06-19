@@ -341,7 +341,7 @@ export class TaskListComponent implements OnInit {
 
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
-      next: (categories) => this.categories.set(categories),
+      next: (result) => this.categories.set(result.categories),
       error: (error) => console.error('Error loading categories:', error),
     });
   }

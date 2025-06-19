@@ -1,12 +1,39 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, BehaviorSubject, map, tap } from 'rxjs';
 import {
   Category,
   CreateCategoryDto,
   UpdateCategoryDto,
 } from '../../shared/models/category.model';
 import { environment } from '../../../environments/environment';
+
+// Interface for the backend response
+interface CategoryListResponse {
+  categories: Category[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CategoryFilters {
+  title?: string;
+}
+
+export interface CategorySorting {
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface CategoryPagination {
+  page: number;
+  limit: number;
+  total?: number;
+  totalPages?: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,11 +45,42 @@ export class CategoryService {
 
   private http = inject(HttpClient);
 
-  // Get all categories
-  getCategories(): Observable<Category[]> {
-    return this.http
-      .get<Category[]>(this.apiUrl)
-      .pipe(tap((categories) => this.categoriesSubject.next(categories)));
+  // Get all categories with optional filters, sorting, and pagination
+  getCategories(
+    filters?: CategoryFilters,
+    sorting?: CategorySorting,
+    pagination?: CategoryPagination
+  ): Observable<{ categories: Category[]; pagination: CategoryPagination }> {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.title && filters.title.trim() !== '') {
+        params = params.set('title', filters.title);
+      }
+    }
+
+    if (sorting) {
+      params = params.set('sortBy', sorting.sortBy);
+      params = params.set('sortOrder', sorting.sortOrder);
+    }
+
+    if (pagination) {
+      params = params.set('page', pagination.page.toString());
+      params = params.set('limit', pagination.limit.toString());
+    }
+
+    return this.http.get<CategoryListResponse>(this.apiUrl, { params }).pipe(
+      map((response) => ({
+        categories: response.categories,
+        pagination: {
+          page: response.pagination.page,
+          limit: response.pagination.limit,
+          total: response.pagination.total,
+          totalPages: response.pagination.totalPages,
+        },
+      })),
+      tap((result) => this.categoriesSubject.next(result.categories))
+    );
   }
 
   // Get a single category by ID

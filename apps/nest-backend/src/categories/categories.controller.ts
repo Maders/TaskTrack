@@ -77,7 +77,7 @@ export class CategoriesController {
 
     const sorting = {
       sortBy: sortBy || 'title',
-      sortOrder: sortOrder || 'asc',
+      sortOrder: (sortOrder === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc',
     };
 
     const pagination = {
