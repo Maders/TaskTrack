@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { ApiProperty } from '@nestjs/swagger';
 
 export const createCategorySchema = z.object({
-  title: z.string().min(1),
-  description: z.string().nullable(),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().nullable().default(null),
 });
 
 export type CreateCategoryDto = z.infer<typeof createCategorySchema>;
@@ -20,6 +20,8 @@ export class CreateCategoryDtoSwagger {
   @ApiProperty({
     description: 'The description of the category',
     example: 'Tasks related to work',
+    required: false,
+    nullable: true,
   })
   description: string | null;
 }
