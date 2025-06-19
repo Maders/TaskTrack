@@ -136,4 +136,9 @@ export class TaskService {
   ): Observable<Task> {
     return this.updateTask(id, { status });
   }
+
+  // Assign category to task
+  assignCategory(taskId: string, categoryId: string | null): Observable<Task> {
+    return this.updateTask(taskId, { categoryId });
+  }
 }

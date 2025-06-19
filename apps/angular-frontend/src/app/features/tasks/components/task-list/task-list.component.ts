@@ -15,14 +15,19 @@ import { Subject, combineLatest } from 'rxjs';
 import { Task, TaskFilters } from '../../../../shared/models/task.model';
 import { TaskService } from '../../../../core/services/task.service';
 import { CategoryService } from '../../../../core/services/category.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { Category } from '../../../../shared/models/category.model';
+import { ToastComponent } from '../../../../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastComponent],
   template: `
     <div class="bg-white shadow rounded-lg">
+      <!-- Toast Notifications -->
+      <app-toast />
+
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-200">
         <div class="flex items-center justify-between">
@@ -227,12 +232,59 @@ import { Category } from '../../../../shared/models/category.model';
                 <span *ngIf="task.dueDate">
                   Due: {{ task.dueDate | date : 'shortDate' }}
                 </span>
-                <span *ngIf="getCategoryName(task.categoryId)" class="italic">
-                  Category: {{ getCategoryName(task.categoryId) }}
+                <span
+                  *ngIf="getCategoryName(task.categoryId)"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                >
+                  {{ getCategoryName(task.categoryId) }}
+                </span>
+                <span
+                  *ngIf="!task.categoryId"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500"
+                >
+                  No Category
                 </span>
               </div>
             </div>
             <div class="flex items-center space-x-2">
+              <!-- Category Assignment Dropdown -->
+              <div class="relative">
+                <label
+                  for="category-{{ task.id }}"
+                  class="block text-xs font-medium text-gray-500 mb-1 flex items-center"
+                >
+                  Category
+                  <svg
+                    class="ml-1 h-3 w-3 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                </label>
+                <select
+                  id="category-{{ task.id }}"
+                  [value]="task.categoryId || ''"
+                  (change)="assignCategory(task.id, $event)"
+                  class="block w-32 pl-3 pr-8 py-1 text-xs border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md bg-white"
+                >
+                  <option value="">No Category</option>
+                  <option
+                    *ngFor="let category of categories()"
+                    [value]="category.id"
+                    [selected]="task.categoryId === category.id"
+                  >
+                    {{ category.title }}
+                  </option>
+                </select>
+              </div>
+
               <button
                 (click)="editTask(task.id)"
                 class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -299,6 +351,7 @@ export class TaskListComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private toastService = inject(ToastService);
 
   // Signals
   loading = signal(false);
@@ -468,5 +521,21 @@ export class TaskListComponent implements OnInit {
       this.currentPage.update((page) => page + 1);
       this.loadTasks(); // Load tasks for the new page
     }
+  }
+
+  assignCategory(taskId: string, event: Event): void {
+    const selectedCategoryId = (event.target as HTMLSelectElement).value;
+    this.taskService
+      .assignCategory(taskId, selectedCategoryId || null)
+      .subscribe({
+        next: () => {
+          this.loadTasks();
+          this.toastService.success('Category assigned successfully');
+        },
+        error: (error: any) => {
+          console.error('Error assigning category:', error);
+          alert('Failed to assign category');
+        },
+      });
   }
 }
