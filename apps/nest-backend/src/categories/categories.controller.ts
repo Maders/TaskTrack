@@ -120,7 +120,6 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  @UsePipes(new ZodValidationPipe(updateCategorySchema))
   @ApiOperation({ summary: 'Update a category' })
   @ApiParam({ name: 'id', description: 'The id of the category' })
   @ApiBody({ type: UpdateCategoryDtoSwagger })
@@ -133,7 +132,8 @@ export class CategoriesController {
   @ApiResponse({ status: 404, description: 'Category not found.' })
   update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto
+    @Body(new ZodValidationPipe(updateCategorySchema))
+    updateCategoryDto: UpdateCategoryDto
   ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }

@@ -103,7 +103,6 @@ export class TasksController {
   }
 
   @Patch(':id')
-  @UsePipes(new ZodValidationPipe(updateTaskSchema))
   @ApiOperation({ summary: 'Update a task' })
   @ApiParam({ name: 'id', description: 'The id of the task' })
   @ApiBody({ type: UpdateTaskDtoSwagger })
@@ -114,7 +113,10 @@ export class TasksController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 404, description: 'Task not found.' })
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+  update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateTaskSchema)) updateTaskDto: UpdateTaskDto
+  ) {
     return this.tasksService.update(id, updateTaskDto);
   }
 
