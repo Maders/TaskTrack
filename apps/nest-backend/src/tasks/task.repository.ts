@@ -26,7 +26,10 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
     return newTask;
   }
 
-  findAll(filters?: TaskFilters, pagination?: TaskPagination): TaskListResult {
+  findAll(
+    filters?: TaskFilters & { dateRangeStart?: string; dateRangeEnd?: string },
+    pagination?: TaskPagination
+  ): TaskListResult {
     let filteredTasks = [...this.tasks];
 
     // Apply filters
@@ -47,6 +50,18 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
         filteredTasks = filteredTasks.filter((task) =>
           task.title.toLowerCase().includes(filters.title!.toLowerCase())
         );
+      }
+
+      // Apply date range filter
+      if (filters.dateRangeStart && filters.dateRangeEnd) {
+        const startDate = new Date(filters.dateRangeStart);
+        const endDate = new Date(filters.dateRangeEnd);
+
+        filteredTasks = filteredTasks.filter((task) => {
+          if (!task.dueDate) return false;
+          const taskDueDate = new Date(task.dueDate);
+          return taskDueDate >= startDate && taskDueDate <= endDate;
+        });
       }
 
       // Apply sorting
@@ -131,7 +146,9 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
     this.tasks = this.tasks.filter((t) => t.id !== id);
   }
 
-  findAllWithoutPagination(filters?: TaskFilters): Task[] {
+  findAllWithoutPagination(
+    filters?: TaskFilters & { dateRangeStart?: string; dateRangeEnd?: string }
+  ): Task[] {
     let filteredTasks = [...this.tasks];
 
     // Apply filters
@@ -152,6 +169,18 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
         filteredTasks = filteredTasks.filter((task) =>
           task.title.toLowerCase().includes(filters.title!.toLowerCase())
         );
+      }
+
+      // Apply date range filter
+      if (filters.dateRangeStart && filters.dateRangeEnd) {
+        const startDate = new Date(filters.dateRangeStart);
+        const endDate = new Date(filters.dateRangeEnd);
+
+        filteredTasks = filteredTasks.filter((task) => {
+          if (!task.dueDate) return false;
+          const taskDueDate = new Date(task.dueDate);
+          return taskDueDate >= startDate && taskDueDate <= endDate;
+        });
       }
     }
 

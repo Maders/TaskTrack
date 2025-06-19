@@ -51,8 +51,8 @@ export class TaskService {
         params = params.set('categoryId', filters.categoryId);
       }
       if (filters.dateRange) {
-        params = params.set('startDate', filters.dateRange.start);
-        params = params.set('endDate', filters.dateRange.end);
+        params = params.set('dateRangeStart', filters.dateRange.start);
+        params = params.set('dateRangeEnd', filters.dateRange.end);
       }
     }
 

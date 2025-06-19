@@ -59,6 +59,8 @@ export class TasksController {
   })
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'dateRangeStart', required: false, type: String })
+  @ApiQuery({ name: 'dateRangeEnd', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'sortBy', required: false, type: String })
@@ -72,6 +74,8 @@ export class TasksController {
     @Query('status') status?: string,
     @Query('categoryId') categoryId?: string,
     @Query('title') title?: string,
+    @Query('dateRangeStart') dateRangeStart?: string,
+    @Query('dateRangeEnd') dateRangeEnd?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('sortBy') sortBy?: string,
@@ -81,6 +85,8 @@ export class TasksController {
       status: status || undefined,
       categoryId: categoryId || undefined,
       title: title || undefined,
+      dateRangeStart: dateRangeStart || undefined,
+      dateRangeEnd: dateRangeEnd || undefined,
       sortBy: sortBy || undefined,
       sortOrder: sortOrder || undefined,
     };

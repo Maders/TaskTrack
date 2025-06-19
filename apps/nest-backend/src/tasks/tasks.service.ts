@@ -28,7 +28,10 @@ export class TasksService {
     return this.taskRepository.create(createTaskDto);
   }
 
-  findAll(filters?: TaskFilters, pagination?: TaskPagination): TaskListResult {
+  findAll(
+    filters?: TaskFilters & { dateRangeStart?: string; dateRangeEnd?: string },
+    pagination?: TaskPagination
+  ): TaskListResult {
     return this.taskRepository.findAll(filters, pagination);
   }
 

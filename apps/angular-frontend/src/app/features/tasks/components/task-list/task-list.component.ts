@@ -56,101 +56,165 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
 
       <!-- Filters -->
       <div class="px-6 py-4 border-b border-gray-200">
-        <form
-          [formGroup]="filterForm"
-          class="grid grid-cols-1 md:grid-cols-6 gap-4"
-        >
-          <div>
-            <label for="status" class="block text-sm font-medium text-gray-700"
-              >Status</label
-            >
-            <select
-              id="status"
-              formControlName="status"
-              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-            >
-              <option value="">All Statuses</option>
-              <option value="To Do">To Do</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              for="category"
-              class="block text-sm font-medium text-gray-700"
-              >Category</label
-            >
-            <select
-              id="category"
-              formControlName="categoryId"
-              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-            >
-              <option value="">All Categories</option>
-              <option
-                *ngFor="let category of categories()"
-                [value]="category.id"
+        <form [formGroup]="filterForm" class="space-y-4">
+          <!-- Main Filters -->
+          <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div>
+              <label
+                for="status"
+                class="block text-sm font-medium text-gray-700"
+                >Status</label
               >
-                {{ category.title }}
-              </option>
-            </select>
+              <select
+                id="status"
+                formControlName="status"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="">All Statuses</option>
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="category"
+                class="block text-sm font-medium text-gray-700"
+                >Category</label
+              >
+              <select
+                id="category"
+                formControlName="categoryId"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="">All Categories</option>
+                <option
+                  *ngFor="let category of categories()"
+                  [value]="category.id"
+                >
+                  {{ category.title }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="search"
+                class="block text-sm font-medium text-gray-700"
+                >Search</label
+              >
+              <input
+                id="search"
+                type="text"
+                formControlName="title"
+                placeholder="Search tasks..."
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label
+                for="sortBy"
+                class="block text-sm font-medium text-gray-700"
+                >Sort By</label
+              >
+              <select
+                id="sortBy"
+                formControlName="sortBy"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="createdAt">Created Date</option>
+                <option value="updatedAt">Updated Date</option>
+                <option value="title">Title</option>
+                <option value="status">Status</option>
+                <option value="dueDate">Due Date</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="sortOrder"
+                class="block text-sm font-medium text-gray-700"
+                >Order</label
+              >
+              <select
+                id="sortOrder"
+                formControlName="sortOrder"
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
+            </div>
+
+            <div class="flex items-end space-x-2">
+              <button
+                type="button"
+                (click)="toggleAdvancedFilters()"
+                class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <svg
+                  class="w-4 h-4 mr-2"
+                  [ngClass]="{ 'rotate-180': showAdvancedFilters() }"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+                Advanced
+              </button>
+              <button
+                type="button"
+                (click)="clearFilters()"
+                class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
-          <div>
-            <label for="search" class="block text-sm font-medium text-gray-700"
-              >Search</label
-            >
-            <input
-              id="search"
-              type="text"
-              formControlName="title"
-              placeholder="Search tasks..."
-              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label for="sortBy" class="block text-sm font-medium text-gray-700"
-              >Sort By</label
-            >
-            <select
-              id="sortBy"
-              formControlName="sortBy"
-              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-            >
-              <option value="createdAt">Created Date</option>
-              <option value="updatedAt">Updated Date</option>
-              <option value="title">Title</option>
-              <option value="status">Status</option>
-              <option value="dueDate">Due Date</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              for="sortOrder"
-              class="block text-sm font-medium text-gray-700"
-              >Order</label
-            >
-            <select
-              id="sortOrder"
-              formControlName="sortOrder"
-              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-            >
-              <option value="desc">Newest First</option>
-              <option value="asc">Oldest First</option>
-            </select>
-          </div>
-
-          <div class="flex items-end">
-            <button
-              type="button"
-              (click)="clearFilters()"
-              class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Clear Filters
-            </button>
+          <!-- Advanced Filters -->
+          <div
+            *ngIf="showAdvancedFilters()"
+            class="border-t border-gray-200 pt-4"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="dateRangeStart"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Due Date Range - Start
+                </label>
+                <input
+                  id="dateRangeStart"
+                  type="date"
+                  formControlName="dateRangeStart"
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  for="dateRangeEnd"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Due Date Range - End
+                </label>
+                <input
+                  id="dateRangeEnd"
+                  type="date"
+                  formControlName="dateRangeEnd"
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
           </div>
         </form>
       </div>
@@ -363,6 +427,7 @@ export class TaskListComponent implements OnInit {
   totalPages = signal(0);
   sortBy = signal('createdAt');
   sortOrder = signal<'asc' | 'desc'>('desc');
+  showAdvancedFilters = signal(false);
 
   // Form
   filterForm: FormGroup;
@@ -378,6 +443,8 @@ export class TaskListComponent implements OnInit {
       title: [''],
       sortBy: ['createdAt'],
       sortOrder: ['desc'],
+      dateRangeStart: [''],
+      dateRangeEnd: [''],
     });
   }
 
@@ -412,10 +479,22 @@ export class TaskListComponent implements OnInit {
         ),
       this.filterForm.get('sortBy')!.valueChanges.pipe(startWith('createdAt')),
       this.filterForm.get('sortOrder')!.valueChanges.pipe(startWith('desc')),
-    ]).subscribe(([status, categoryId, title, sortBy, sortOrder]) => {
-      this.currentPage.set(1);
-      this.loadTasks(); // Actually load tasks when filters change
-    });
+      this.filterForm.get('dateRangeStart')!.valueChanges.pipe(startWith('')),
+      this.filterForm.get('dateRangeEnd')!.valueChanges.pipe(startWith('')),
+    ]).subscribe(
+      ([
+        status,
+        categoryId,
+        title,
+        sortBy,
+        sortOrder,
+        dateRangeStart,
+        dateRangeEnd,
+      ]) => {
+        this.currentPage.set(1);
+        this.loadTasks(); // Actually load tasks when filters change
+      }
+    );
   }
 
   private loadTasks(): void {
@@ -426,6 +505,8 @@ export class TaskListComponent implements OnInit {
     const titleValue = this.filterForm.get('title')?.value;
     const sortByValue = this.filterForm.get('sortBy')?.value;
     const sortOrderValue = this.filterForm.get('sortOrder')?.value;
+    const dateRangeStartValue = this.filterForm.get('dateRangeStart')?.value;
+    const dateRangeEndValue = this.filterForm.get('dateRangeEnd')?.value;
 
     const filters: TaskFilters = {
       status:
@@ -435,6 +516,13 @@ export class TaskListComponent implements OnInit {
           ? categoryValue
           : undefined,
       title: titleValue && titleValue.trim() !== '' ? titleValue : undefined,
+      dateRange:
+        dateRangeStartValue && dateRangeEndValue
+          ? {
+              start: dateRangeStartValue,
+              end: dateRangeEndValue,
+            }
+          : undefined,
     };
 
     this.taskService
@@ -516,6 +604,8 @@ export class TaskListComponent implements OnInit {
       title: '',
       sortBy: 'createdAt',
       sortOrder: 'desc',
+      dateRangeStart: '',
+      dateRangeEnd: '',
     });
   }
 
@@ -547,5 +637,9 @@ export class TaskListComponent implements OnInit {
           alert('Failed to assign category');
         },
       });
+  }
+
+  toggleAdvancedFilters(): void {
+    this.showAdvancedFilters.update((show) => !show);
   }
 }
