@@ -10,6 +10,17 @@ import {
 } from '../../shared/models/task.model';
 import { environment } from '../../../environments/environment';
 
+// Interface for the backend response
+interface TaskListResponse {
+  tasks: Task[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,10 +39,15 @@ export class TaskService {
     let params = new HttpParams();
 
     if (filters) {
-      if (filters.status) params = params.set('status', filters.status);
-      if (filters.title) params = params.set('title', filters.title);
-      if (filters.categoryId)
+      if (filters.status && filters.status.trim() !== '') {
+        params = params.set('status', filters.status);
+      }
+      if (filters.title && filters.title.trim() !== '') {
+        params = params.set('title', filters.title);
+      }
+      if (filters.categoryId && filters.categoryId.trim() !== '') {
         params = params.set('categoryId', filters.categoryId);
+      }
       if (filters.dateRange) {
         params = params.set('startDate', filters.dateRange.start);
         params = params.set('endDate', filters.dateRange.end);
@@ -43,14 +59,14 @@ export class TaskService {
       params = params.set('limit', pagination.limit.toString());
     }
 
-    return this.http.get<Task[]>(this.apiUrl, { params }).pipe(
-      map((tasks) => ({
-        tasks,
+    return this.http.get<TaskListResponse>(this.apiUrl, { params }).pipe(
+      map((response) => ({
+        tasks: response.tasks,
         pagination: {
-          page: pagination?.page || 1,
-          limit: pagination?.limit || 10,
-          total: tasks.length, // This would come from headers in a real API
-          totalPages: Math.ceil(tasks.length / (pagination?.limit || 10)),
+          page: response.pagination.page,
+          limit: response.pagination.limit,
+          total: response.pagination.total,
+          totalPages: response.pagination.totalPages,
         },
       })),
       tap((result) => this.tasksSubject.next(result.tasks))
@@ -98,7 +114,9 @@ export class TaskService {
 
   // Get tasks by category
   getTasksByCategory(categoryId: string): Observable<Task[]> {
-    return this.http.get<Task[]>(`${this.apiUrl}?categoryId=${categoryId}`);
+    return this.http
+      .get<TaskListResponse>(`${this.apiUrl}?categoryId=${categoryId}`)
+      .pipe(map((response) => response.tasks));
   }
 
   // Update task status

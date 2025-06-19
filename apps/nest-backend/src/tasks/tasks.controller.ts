@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import {
@@ -26,6 +27,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Task } from './entities/task.entity';
 
@@ -49,10 +51,40 @@ export class TasksController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all tasks' })
-  @ApiResponse({ status: 200, description: 'Return all tasks.', type: [Task] })
-  findAll() {
-    return this.tasksService.findAll();
+  @ApiOperation({ summary: 'Get all tasks with optional filtering' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['To Do', 'In Progress', 'Done'],
+  })
+  @ApiQuery({ name: 'categoryId', required: false, type: String })
+  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'Return filtered tasks.',
+    type: [Task],
+  })
+  findAll(
+    @Query('status') status?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('title') title?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    const filters = {
+      status: status || undefined,
+      categoryId: categoryId || undefined,
+      title: title || undefined,
+    };
+
+    const pagination = {
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 10,
+    };
+
+    return this.tasksService.findAll(filters, pagination);
   }
 
   @Get(':id')

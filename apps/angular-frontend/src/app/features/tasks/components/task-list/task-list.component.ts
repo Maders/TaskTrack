@@ -280,16 +280,12 @@ export class TaskListComponent implements OnInit {
       categoryId: [''],
       title: [''],
     });
-
-    // Set up filter effect
-    effect(() => {
-      this.loadTasks();
-    });
   }
 
   ngOnInit(): void {
     this.loadCategories();
     this.setupFilterSubscription();
+    this.loadTasks(); // Load initial tasks
   }
 
   private setupFilterSubscription(): void {
@@ -303,17 +299,25 @@ export class TaskListComponent implements OnInit {
         .valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
     ]).subscribe(([status, categoryId, title]) => {
       this.currentPage.set(1);
-      this.filterSubject.next({ status, categoryId, title });
+      this.loadTasks(); // Actually load tasks when filters change
     });
   }
 
   private loadTasks(): void {
     this.loading.set(true);
 
+    const statusValue = this.filterForm.get('status')?.value;
+    const categoryValue = this.filterForm.get('categoryId')?.value;
+    const titleValue = this.filterForm.get('title')?.value;
+
     const filters: TaskFilters = {
-      status: this.filterForm.get('status')?.value || undefined,
-      categoryId: this.filterForm.get('categoryId')?.value || undefined,
-      title: this.filterForm.get('title')?.value || undefined,
+      status:
+        statusValue && statusValue.trim() !== '' ? statusValue : undefined,
+      categoryId:
+        categoryValue && categoryValue.trim() !== ''
+          ? categoryValue
+          : undefined,
+      title: titleValue && titleValue.trim() !== '' ? titleValue : undefined,
     };
 
     this.taskService
@@ -390,12 +394,14 @@ export class TaskListComponent implements OnInit {
   previousPage(): void {
     if (this.currentPage() > 1) {
       this.currentPage.update((page) => page - 1);
+      this.loadTasks(); // Load tasks for the new page
     }
   }
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((page) => page + 1);
+      this.loadTasks(); // Load tasks for the new page
     }
   }
 }
