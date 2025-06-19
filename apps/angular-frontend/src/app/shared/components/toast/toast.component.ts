@@ -10,7 +10,7 @@ import { ToastService } from '../../../core/services/toast.service';
     <div class="fixed top-4 right-4 z-50 space-y-2">
       <div
         *ngFor="let toast of toasts()"
-        class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+        class="max-w-md min-w-80 w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
         [ngClass]="getToastClasses(toast.type)"
       >
         <div class="p-4">
