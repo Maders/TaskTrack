@@ -1,14 +1,20 @@
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
-import { Category } from '../entities/category.entity';
+import {
+  CategoryFilters,
+  CategorySorting,
+  CategoryPagination,
+  CategoryListResult,
+} from './category.repository.interface';
 
 export abstract class AbstractCategoriesService {
-  abstract create(createCategoryDto: CreateCategoryDto): Category;
-  abstract findAll(): Category[];
-  abstract findOne(id: string): Category | undefined;
-  abstract update(
-    id: string,
-    updateCategoryDto: UpdateCategoryDto
-  ): Category | undefined;
+  abstract create(createCategoryDto: CreateCategoryDto): any;
+  abstract findAll(
+    filters?: CategoryFilters,
+    sorting?: CategorySorting,
+    pagination?: CategoryPagination
+  ): CategoryListResult;
+  abstract findOne(id: string): any;
+  abstract update(id: string, updateCategoryDto: UpdateCategoryDto): any;
   abstract remove(id: string): void;
 }

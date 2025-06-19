@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { AbstractCategoryRepository } from './interfaces/category.repository.interface';
+import {
+  AbstractCategoryRepository,
+  CategoryFilters,
+  CategorySorting,
+  CategoryPagination,
+  CategoryListResult,
+} from './interfaces/category.repository.interface';
 import { AbstractCategoriesService } from './interfaces/categories.service.interface';
 
 @Injectable()
@@ -14,8 +20,12 @@ export class CategoriesService implements AbstractCategoriesService {
     return this.categoryRepository.create(createCategoryDto);
   }
 
-  findAll() {
-    return this.categoryRepository.findAll();
+  findAll(
+    filters?: CategoryFilters,
+    sorting?: CategorySorting,
+    pagination?: CategoryPagination
+  ): CategoryListResult {
+    return this.categoryRepository.findAll(filters, sorting, pagination);
   }
 
   findOne(id: string) {

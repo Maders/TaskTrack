@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import {
   CreateCategoryDto,
@@ -25,6 +26,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Category } from './entities/category.entity';
 import { AbstractCategoriesService } from './interfaces/categories.service.interface';
@@ -49,14 +51,41 @@ export class CategoriesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all categories' })
+  @ApiOperation({
+    summary: 'Get all categories with optional filtering and pagination',
+  })
+  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['title', 'createdAt'] })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Return all categories.',
+    description: 'Return filtered categories.',
     type: [Category],
   })
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(
+    @Query('title') title?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ) {
+    const filters = {
+      title: title || undefined,
+    };
+
+    const sorting = {
+      sortBy: sortBy || 'title',
+      sortOrder: sortOrder || 'asc',
+    };
+
+    const pagination = {
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 10,
+    };
+
+    return this.categoriesService.findAll(filters, sorting, pagination);
   }
 
   @Get(':id')
