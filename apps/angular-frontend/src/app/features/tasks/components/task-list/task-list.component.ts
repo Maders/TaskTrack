@@ -194,7 +194,7 @@ import { Category } from '../../../../shared/models/category.model';
                 <span *ngIf="task.dueDate">
                   Due: {{ task.dueDate | date : 'shortDate' }}
                 </span>
-                <span *ngIf="getCategoryName(task.categoryId)">
+                <span *ngIf="getCategoryName(task.categoryId)" class="italic">
                   Category: {{ getCategoryName(task.categoryId) }}
                 </span>
               </div>
