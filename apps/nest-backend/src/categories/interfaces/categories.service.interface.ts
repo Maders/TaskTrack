@@ -1,5 +1,6 @@
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { Category } from '../entities/category.entity';
 import {
   CategoryFilters,
   CategorySorting,
@@ -13,14 +14,17 @@ export interface CategoryDeletionResult {
 }
 
 export abstract class AbstractCategoriesService {
-  abstract create(createCategoryDto: CreateCategoryDto): any;
+  abstract create(createCategoryDto: CreateCategoryDto): Category;
   abstract findAll(
     filters?: CategoryFilters,
     sorting?: CategorySorting,
     pagination?: CategoryPagination
   ): CategoryListResult;
-  abstract findOne(id: string): any;
-  abstract update(id: string, updateCategoryDto: UpdateCategoryDto): any;
+  abstract findOne(id: string): Category | undefined;
+  abstract update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto
+  ): Category | undefined;
   abstract remove(id: string): CategoryDeletionResult;
   abstract getTaskCountsByCategory(): Record<string, number>;
 }

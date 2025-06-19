@@ -8,10 +8,10 @@ import {
   TaskListResult,
 } from './interfaces/task.repository.interface';
 import { AbstractCategoriesService } from '../categories/interfaces/categories.service.interface';
-import { Task } from './entities/task.entity';
+import { AbstractTasksService } from './interfaces/tasks.service.interface';
 
 @Injectable()
-export class TasksService {
+export class TasksService implements AbstractTasksService {
   constructor(
     private readonly taskRepository: AbstractTaskRepository,
     private readonly categoriesService: AbstractCategoriesService
