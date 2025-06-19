@@ -1,101 +1,332 @@
-# Tasktrack2
+# TaskTrack2 - Task Manager Application
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A modern task management application built with Angular frontend and Nest.js backend in an Nx monorepo.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## 🚀 Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+### Tasks Management
 
-## Run tasks
+- ✅ Create, edit, delete tasks
+- ✅ Filter tasks by status, category, title
+- ✅ Sort and paginate tasks
+- ✅ Task status: To Do, In Progress, Done
+- ✅ Due date management
+- ✅ Category assignment
 
-To run the dev server for your app, use:
+### Categories Management
 
-```sh
-npx nx serve angular-frontend
+- ✅ View categories with task counts
+- ✅ Assign tasks to categories
+- ✅ Category-based task filtering
+
+### Technical Features
+
+- ✅ Modern Angular 20+ with standalone components
+- ✅ Reactive forms with validation
+- ✅ Tailwind CSS for styling
+- ✅ Nest.js REST API with Swagger documentation
+- ✅ TypeScript throughout
+- ✅ Environment-based configuration
+
+## 📋 Prerequisites
+
+- Node.js (v18 or higher)
+- pnpm (recommended) or npm
+- Git
+
+## 🛠️ Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd tasktrack2
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+## ⚙️ Environment Configuration
+
+### Backend (Nest.js)
+
+The backend runs on `http://localhost:3000` by default with the following configuration:
+
+- **Port**: 3000 (configurable via `PORT` environment variable)
+- **Global API Prefix**: `/api`
+- **CORS**: Enabled for `http://localhost:4200` (Angular dev server)
+- **Swagger Documentation**: Available at `http://localhost:3000/docs`
+
+### Frontend (Angular)
+
+The frontend is configured to connect to the backend via environment files:
+
+#### Development Environment (`apps/angular-frontend/src/environments/environment.ts`)
+
+```typescript
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:3000/api',
+};
 ```
 
-To create a production bundle:
+#### Production Environment (`apps/angular-frontend/src/environments/environment.prod.ts`)
 
-```sh
-npx nx build angular-frontend
+```typescript
+export const environment = {
+  production: true,
+  apiBaseUrl: 'http://localhost:3000/api',
+};
 ```
 
-To see all available targets to run for a project, run:
+### Customizing API URL
 
-```sh
-npx nx show project angular-frontend
+To change the API base URL:
+
+1. **For Development**: Edit `apps/angular-frontend/src/environments/environment.ts`
+2. **For Production**: Edit `apps/angular-frontend/src/environments/environment.prod.ts`
+3. **For Different Environments**: Create new environment files and update `angular.json`
+
+## 🚀 Running the Application
+
+### Development Mode
+
+#### Option 1: Start Both Applications Together (Recommended)
+
+```bash
+# Start both backend and frontend in one command
+pnpm dev
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+#### Option 2: Start Applications Separately
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+1. **Start the Backend**
 
-## Add new projects
+   ```bash
+   # Terminal 1
+   pnpm dev:backend
+   # or
+   npx nx serve nest-backend
+   ```
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+   The backend will be available at `http://localhost:3000`
 
-Use the plugin's generator to create new projects.
+2. **Start the Frontend**
+   ```bash
+   # Terminal 2
+   pnpm dev:frontend
+   # or
+   npx nx serve angular-frontend
+   ```
+   The frontend will be available at `http://localhost:4200`
 
-To generate a new application, use:
+### Production Build
 
-```sh
-npx nx g @nx/angular:app demo
+1. **Build the Backend**
+
+   ```bash
+   npx nx build nest-backend
+   ```
+
+2. **Build the Frontend**
+
+   ```bash
+   npx nx build angular-frontend
+   ```
+
+3. **Serve Production Build**
+   ```bash
+   npx nx serve-static angular-frontend
+   ```
+
+## 📁 Project Structure
+
+```
+tasktrack2/
+├── apps/
+│   ├── angular-frontend/          # Angular application
+│   │   ├── src/
+│   │   │   ├── app/
+│   │   │   │   ├── core/          # Core services, guards, interceptors
+│   │   │   │   ├── features/      # Feature modules
+│   │   │   │   │   ├── tasks/     # Tasks feature
+│   │   │   │   │   └── categories/ # Categories feature
+│   │   │   │   └── shared/        # Shared components, models, utilities
+│   │   │   └── environments/      # Environment configuration
+│   │   └── ...
+│   └── nest-backend/              # Nest.js API
+│       ├── src/
+│       │   ├── tasks/             # Tasks module
+│       │   ├── categories/        # Categories module
+│       │   └── ...
+│       └── ...
+└── ...
 ```
 
-To generate a new library, use:
+## 🔧 Available Commands
 
-```sh
-npx nx g @nx/angular:lib mylib
+### Nx Commands
+
+```bash
+# Development
+npx nx serve angular-frontend     # Start Angular dev server
+npx nx serve nest-backend         # Start Nest.js dev server
+
+# Building
+npx nx build angular-frontend     # Build Angular for production
+npx nx build nest-backend         # Build Nest.js for production
+
+# Testing
+npx nx test angular-frontend      # Run Angular tests
+npx nx test nest-backend          # Run Nest.js tests
+
+# Linting
+npx nx lint angular-frontend      # Lint Angular code
+npx nx lint nest-backend          # Lint Nest.js code
+
+# E2E Testing
+npx nx e2e angular-frontend-e2e   # Run Angular E2E tests
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Package Manager Commands
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+# Install dependencies
+pnpm install
 
-## Set up CI!
+# Development (start both backend and frontend)
+pnpm dev
 
-### Step 1
+# Development (start individually)
+pnpm dev:backend      # Start only backend
+pnpm dev:frontend     # Start only frontend
 
-To connect to Nx Cloud, run the following command:
+# Build and test
+pnpm build            # Build all projects
+pnpm test             # Test all projects
+pnpm lint             # Lint all projects
 
-```sh
-npx nx connect
+# Add new dependencies
+pnpm add <package-name>           # Add to root
+pnpm add <package-name> --filter=angular-frontend  # Add to Angular
+pnpm add <package-name> --filter=nest-backend      # Add to Nest.js
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+## 🌐 API Endpoints
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Tasks
 
-### Step 2
+- `GET /api/tasks` - Get all tasks
+- `GET /api/tasks/:id` - Get task by ID
+- `POST /api/tasks` - Create new task
+- `PATCH /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
 
-Use the following command to configure a CI workflow for your workspace:
+### Categories
 
-```sh
-npx nx g ci-workflow
+- `GET /api/categories` - Get all categories
+- `GET /api/categories/:id` - Get category by ID
+- `POST /api/categories` - Create new category
+- `PATCH /api/categories/:id` - Update category
+- `DELETE /api/categories/:id` - Delete category
+
+### Swagger Documentation
+
+Visit `http://localhost:3000/docs` for interactive API documentation.
+
+## 🔒 Environment Variables
+
+### Backend Environment Variables
+
+```bash
+PORT=3000                    # Server port (default: 3000)
+NODE_ENV=development         # Environment mode
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Frontend Environment Variables
 
-## Install Nx Console
+The frontend uses Angular's environment system. See the `environments/` folder for configuration.
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## 🧪 Testing
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Unit Tests
 
-## Useful links
+```bash
+npx nx test angular-frontend
+npx nx test nest-backend
+```
 
-Learn more:
+### E2E Tests
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+npx nx e2e angular-frontend-e2e
+```
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Test Coverage
+
+```bash
+npx nx test angular-frontend --coverage
+npx nx test nest-backend --coverage
+```
+
+## 📦 Deployment
+
+### Backend Deployment
+
+1. Build the application: `npx nx build nest-backend`
+2. The built files will be in `dist/apps/nest-backend`
+3. Deploy the contents to your server
+4. Set environment variables as needed
+
+### Frontend Deployment
+
+1. Build the application: `npx nx build angular-frontend`
+2. The built files will be in `dist/apps/angular-frontend/browser`
+3. Deploy the contents to your static hosting service
+4. Update the environment configuration for production
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+1. **CORS Errors**
+
+   - Ensure the backend is running on port 3000
+   - Check that CORS is enabled in `main.ts`
+   - Verify the frontend is running on port 4200
+
+2. **API Connection Issues**
+
+   - Check the `apiBaseUrl` in environment files
+   - Ensure the backend is running and accessible
+   - Verify the API endpoints match the backend routes
+
+3. **Build Errors**
+
+   - Clear node_modules and reinstall: `rm -rf node_modules && pnpm install`
+   - Clear Nx cache: `npx nx reset`
+   - Check TypeScript errors: `npx nx lint angular-frontend`
+
+4. **Port Conflicts**
+   - Change the backend port: `PORT=3001 npx nx serve nest-backend`
+   - Update the environment files accordingly
+
+### Getting Help
+
+- Check the [Nx documentation](https://nx.dev/)
+- Review the [Angular documentation](https://angular.dev/)
+- Review the [Nest.js documentation](https://docs.nestjs.com/)

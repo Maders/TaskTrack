@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { TaskListPage } from './pages/task-list-page';
-import { TaskCreatePage } from './pages/task-create-page';
-import { TaskEditPage } from './pages/task-edit-page';
+import { TaskListPageComponent } from './pages/task-list-page/task-list-page.component';
+import { TaskCreatePageComponent } from './pages/task-create-page/task-create-page.component';
+import { TaskEditPageComponent } from './pages/task-edit-page/task-edit-page.component';
 
 const routes: Routes = [
-  { path: '', component: TaskListPage },
-  { path: 'create', component: TaskCreatePage },
-  { path: 'edit/:id', component: TaskEditPage },
+  { path: '', component: TaskListPageComponent },
+  { path: 'create', component: TaskCreatePageComponent },
+  { path: 'edit/:id', component: TaskEditPageComponent },
 ];
 
 @NgModule({

@@ -1,0 +1,401 @@
+import { Component, OnInit, inject, signal, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+
+import { Task, TaskFilters } from '../../../../shared/models/task.model';
+import { TaskService } from '../../../../core/services/task.service';
+import { CategoryService } from '../../../../core/services/category.service';
+import { Category } from '../../../../shared/models/category.model';
+
+@Component({
+  selector: 'app-task-list',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
+    <div class="bg-white shadow rounded-lg">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-medium text-gray-900">Tasks</h2>
+          <button
+            (click)="createTask()"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <svg
+              class="-ml-1 mr-2 h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            New Task
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="px-6 py-4 border-b border-gray-200">
+        <form
+          [formGroup]="filterForm"
+          class="grid grid-cols-1 md:grid-cols-4 gap-4"
+        >
+          <div>
+            <label for="status" class="block text-sm font-medium text-gray-700"
+              >Status</label
+            >
+            <select
+              id="status"
+              formControlName="status"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="">All Statuses</option>
+              <option value="To Do">To Do</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="category"
+              class="block text-sm font-medium text-gray-700"
+              >Category</label
+            >
+            <select
+              id="category"
+              formControlName="categoryId"
+              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="">All Categories</option>
+              <option
+                *ngFor="let category of categories()"
+                [value]="category.id"
+              >
+                {{ category.title }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700"
+              >Search</label
+            >
+            <input
+              id="search"
+              type="text"
+              formControlName="title"
+              placeholder="Search tasks..."
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div class="flex items-end">
+            <button
+              type="button"
+              (click)="clearFilters()"
+              class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="p-6">
+        <div class="flex items-center justify-center">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+          ></div>
+          <span class="ml-2 text-gray-600">Loading tasks...</span>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading() && tasks().length === 0" class="p-6">
+        <div class="text-center py-12">
+          <div class="mx-auto h-12 w-12 text-gray-400">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Get started by creating your first task.
+          </p>
+          <div class="mt-6">
+            <button
+              (click)="createTask()"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Create Task
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task List -->
+      <div
+        *ngIf="!loading() && tasks().length > 0"
+        class="divide-y divide-gray-200"
+      >
+        <div
+          *ngFor="let task of tasks()"
+          class="px-6 py-4 hover:bg-gray-50 transition-colors duration-150"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-3">
+                <h3 class="text-sm font-medium text-gray-900 truncate">
+                  {{ task.title }}
+                </h3>
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="getStatusClasses(task.status)"
+                >
+                  {{ task.status }}
+                </span>
+              </div>
+              <p
+                *ngIf="task.description"
+                class="mt-1 text-sm text-gray-500 truncate"
+              >
+                {{ task.description }}
+              </p>
+              <div
+                class="mt-2 flex items-center space-x-4 text-xs text-gray-500"
+              >
+                <span *ngIf="task.dueDate">
+                  Due: {{ task.dueDate | date : 'shortDate' }}
+                </span>
+                <span *ngIf="getCategoryName(task.categoryId)">
+                  Category: {{ getCategoryName(task.categoryId) }}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button
+                (click)="editTask(task.id)"
+                class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Edit
+              </button>
+              <button
+                (click)="deleteTask(task.id)"
+                class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div
+        *ngIf="!loading() && tasks().length > 0"
+        class="px-6 py-4 border-t border-gray-200"
+      >
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-700">
+            Showing {{ (currentPage() - 1) * pageSize() + 1 }} to
+            {{ Math.min(currentPage() * pageSize(), totalTasks()) }} of
+            {{ totalTasks() }} results
+          </div>
+          <div class="flex items-center space-x-2">
+            <button
+              (click)="previousPage()"
+              [disabled]="currentPage() === 1"
+              class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span class="text-sm text-gray-700">
+              Page {{ currentPage() }} of {{ totalPages() }}
+            </span>
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+              class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+})
+export class TaskListComponent implements OnInit {
+  private taskService = inject(TaskService);
+  private categoryService = inject(CategoryService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
+  // Signals
+  loading = signal(false);
+  tasks = signal<Task[]>([]);
+  categories = signal<Category[]>([]);
+  currentPage = signal(1);
+  pageSize = signal(10);
+  totalTasks = signal(0);
+  totalPages = signal(0);
+
+  // Form
+  filterForm: FormGroup;
+  private filterSubject = new Subject<TaskFilters>();
+
+  // Computed
+  Math = Math;
+
+  constructor() {
+    this.filterForm = this.fb.group({
+      status: [''],
+      categoryId: [''],
+      title: [''],
+    });
+
+    // Set up filter effect
+    effect(() => {
+      this.loadTasks();
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadCategories();
+    this.setupFilterSubscription();
+  }
+
+  private setupFilterSubscription(): void {
+    combineLatest([
+      this.filterForm.get('status')!.valueChanges.pipe(distinctUntilChanged()),
+      this.filterForm
+        .get('categoryId')!
+        .valueChanges.pipe(distinctUntilChanged()),
+      this.filterForm
+        .get('title')!
+        .valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
+    ]).subscribe(([status, categoryId, title]) => {
+      this.currentPage.set(1);
+      this.filterSubject.next({ status, categoryId, title });
+    });
+  }
+
+  private loadTasks(): void {
+    this.loading.set(true);
+
+    const filters: TaskFilters = {
+      status: this.filterForm.get('status')?.value || undefined,
+      categoryId: this.filterForm.get('categoryId')?.value || undefined,
+      title: this.filterForm.get('title')?.value || undefined,
+    };
+
+    this.taskService
+      .getTasks(filters, {
+        page: this.currentPage(),
+        limit: this.pageSize(),
+      })
+      .subscribe({
+        next: (result) => {
+          this.tasks.set(result.tasks);
+          this.totalTasks.set(result.pagination.total);
+          this.totalPages.set(result.pagination.totalPages);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading tasks:', error);
+          this.loading.set(false);
+        },
+      });
+  }
+
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => this.categories.set(categories),
+      error: (error) => console.error('Error loading categories:', error),
+    });
+  }
+
+  getCategoryName(categoryId: string | null): string | null {
+    if (!categoryId) return null;
+    const category = this.categories().find((c) => c.id === categoryId);
+    return category?.title || null;
+  }
+
+  getStatusClasses(status: 'To Do' | 'In Progress' | 'Done'): string {
+    switch (status) {
+      case 'To Do':
+        return 'bg-gray-100 text-gray-800';
+      case 'In Progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'Done':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  createTask(): void {
+    this.router.navigate(['/tasks/create']);
+  }
+
+  editTask(id: string): void {
+    this.router.navigate(['/tasks/edit', id]);
+  }
+
+  deleteTask(id: string): void {
+    if (confirm('Are you sure you want to delete this task?')) {
+      this.taskService.deleteTask(id).subscribe({
+        next: () => {
+          this.loadTasks();
+        },
+        error: (error) => {
+          console.error('Error deleting task:', error);
+          alert('Failed to delete task');
+        },
+      });
+    }
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset();
+  }
+
+  previousPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((page) => page - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((page) => page + 1);
+    }
+  }
+}

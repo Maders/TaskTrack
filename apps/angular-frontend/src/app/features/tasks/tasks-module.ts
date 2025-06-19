@@ -3,24 +3,26 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { TasksRoutingModule } from './tasks-routing-module';
+import { CoreModule } from '../../core/core-module';
 
-import { TaskList } from './components/task-list';
-import { TaskForm } from './components/task-form';
-import { TaskListPage } from './pages/task-list-page';
-import { TaskCreatePage } from './pages/task-create-page';
-import { TaskEditPage } from './pages/task-edit-page';
+import { TaskListComponent } from './components/task-list/task-list.component';
+import { TaskFormComponent } from './components/task-form/task-form.component';
+import { TaskListPageComponent } from './pages/task-list-page/task-list-page.component';
+import { TaskCreatePageComponent } from './pages/task-create-page/task-create-page.component';
+import { TaskEditPageComponent } from './pages/task-edit-page/task-edit-page.component';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    CoreModule,
     TasksRoutingModule,
-    TaskList,
-    TaskForm,
-    TaskListPage,
-    TaskCreatePage,
-    TaskEditPage,
+    TaskListComponent,
+    TaskFormComponent,
+    TaskListPageComponent,
+    TaskCreatePageComponent,
+    TaskEditPageComponent,
   ],
 })
 export class TasksModule {}
