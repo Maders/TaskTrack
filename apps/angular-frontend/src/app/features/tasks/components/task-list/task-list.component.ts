@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { Subject, combineLatest } from 'rxjs';
 
 import { Task, TaskFilters } from '../../../../shared/models/task.model';
@@ -397,17 +397,21 @@ export class TaskListComponent implements OnInit {
 
   private setupFilterSubscription(): void {
     combineLatest([
-      this.filterForm.get('status')!.valueChanges.pipe(distinctUntilChanged()),
+      this.filterForm
+        .get('status')!
+        .valueChanges.pipe(startWith(''), distinctUntilChanged()),
       this.filterForm
         .get('categoryId')!
-        .valueChanges.pipe(distinctUntilChanged()),
+        .valueChanges.pipe(startWith(''), distinctUntilChanged()),
       this.filterForm
         .get('title')!
-        .valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
-      this.filterForm.get('sortBy')!.valueChanges.pipe(distinctUntilChanged()),
-      this.filterForm
-        .get('sortOrder')!
-        .valueChanges.pipe(distinctUntilChanged()),
+        .valueChanges.pipe(
+          startWith(''),
+          debounceTime(300),
+          distinctUntilChanged()
+        ),
+      this.filterForm.get('sortBy')!.valueChanges.pipe(startWith('createdAt')),
+      this.filterForm.get('sortOrder')!.valueChanges.pipe(startWith('desc')),
     ]).subscribe(([status, categoryId, title, sortBy, sortOrder]) => {
       this.currentPage.set(1);
       this.loadTasks(); // Actually load tasks when filters change
@@ -506,7 +510,13 @@ export class TaskListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filterForm.reset();
+    this.filterForm.reset({
+      status: '',
+      categoryId: '',
+      title: '',
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
   }
 
   previousPage(): void {
