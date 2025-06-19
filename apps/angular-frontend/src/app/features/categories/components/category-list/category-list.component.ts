@@ -205,6 +205,11 @@ import { ToastService } from '../../../../core/services/toast.service';
                 <h3 class="text-sm font-medium text-gray-900 truncate">
                   {{ category.title }}
                 </h3>
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                >
+                  {{ getTaskCount(category.id) }} tasks
+                </span>
               </div>
               <p
                 *ngIf="category.description"
@@ -217,6 +222,12 @@ import { ToastService } from '../../../../core/services/toast.service';
               </p>
             </div>
             <div class="flex items-center space-x-2">
+              <button
+                (click)="viewCategoryTasks(category.id)"
+                class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                View Tasks
+              </button>
               <button
                 (click)="editCategory(category)"
                 class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -292,6 +303,7 @@ export class CategoryListComponent implements OnInit {
   totalPages = signal(1);
   totalItems = signal(0);
   itemsPerPage = signal(10);
+  categoryTaskCounts = signal<Record<string, number>>({});
 
   // Computed values
   paginationInfo = computed(() => {
@@ -317,6 +329,7 @@ export class CategoryListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadCategoryTaskCounts();
   }
 
   private loadCategories(): void {
@@ -349,6 +362,21 @@ export class CategoryListComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  private loadCategoryTaskCounts(): void {
+    this.categoryService.getTaskCountsByCategory().subscribe({
+      next: (counts) => {
+        this.categoryTaskCounts.set(counts);
+      },
+      error: (error) => {
+        console.error('Error loading task counts:', error);
+      },
+    });
+  }
+
+  getTaskCount(categoryId: string): number {
+    return this.categoryTaskCounts()[categoryId] || 0;
   }
 
   onSearchChange(): void {
@@ -388,15 +416,19 @@ export class CategoryListComponent implements OnInit {
   }
 
   deleteCategory(category: Category): void {
-    if (
-      confirm(
-        `Are you sure you want to delete the category "${category.title}"?`
-      )
-    ) {
+    const taskCount = this.getTaskCount(category.id);
+    let confirmMessage = `Are you sure you want to delete the category "${category.title}"?`;
+
+    if (taskCount > 0) {
+      confirmMessage += `\n\nThis category has ${taskCount} associated task(s). These tasks will have their category unassigned.`;
+    }
+
+    if (confirm(confirmMessage)) {
       this.categoryService.deleteCategory(category.id).subscribe({
-        next: () => {
-          this.toastService.show('Category deleted successfully', 'success');
+        next: (response) => {
+          this.toastService.show(response.message, 'success');
           this.loadCategories();
+          this.loadCategoryTaskCounts(); // Refresh task counts
         },
         error: (error) => {
           console.error('Error deleting category:', error);

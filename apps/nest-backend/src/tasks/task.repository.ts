@@ -82,4 +82,31 @@ export class InMemoryTaskRepository implements AbstractTaskRepository {
   delete(id: string): void {
     this.tasks = this.tasks.filter((t) => t.id !== id);
   }
+
+  findAllWithoutPagination(filters?: TaskFilters): Task[] {
+    let filteredTasks = [...this.tasks];
+
+    // Apply filters
+    if (filters) {
+      if (filters.status && filters.status.trim() !== '') {
+        filteredTasks = filteredTasks.filter(
+          (task) => task.status === filters.status
+        );
+      }
+
+      if (filters.categoryId && filters.categoryId.trim() !== '') {
+        filteredTasks = filteredTasks.filter(
+          (task) => task.categoryId === filters.categoryId
+        );
+      }
+
+      if (filters.title && filters.title.trim() !== '') {
+        filteredTasks = filteredTasks.filter((task) =>
+          task.title.toLowerCase().includes(filters.title!.toLowerCase())
+        );
+      }
+    }
+
+    return filteredTasks;
+  }
 }

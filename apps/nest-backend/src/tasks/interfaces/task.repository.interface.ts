@@ -31,4 +31,5 @@ export abstract class AbstractTaskRepository {
   abstract findById(id: string): Task | undefined;
   abstract update(id: string, update: Partial<Task>): Task | undefined;
   abstract delete(id: string): void;
+  abstract findAllWithoutPagination(filters?: TaskFilters): Task[];
 }

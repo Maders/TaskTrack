@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, effect } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  effect,
+  Input,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -253,6 +260,8 @@ import { Category } from '../../../../shared/models/category.model';
   ],
 })
 export class TaskListComponent implements OnInit {
+  @Input() initialFilters: { categoryId?: string } = {};
+
   private taskService = inject(TaskService);
   private categoryService = inject(CategoryService);
   private router = inject(Router);
@@ -285,6 +294,14 @@ export class TaskListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.setupFilterSubscription();
+
+    // Apply initial filters if provided
+    if (this.initialFilters.categoryId) {
+      this.filterForm.patchValue({
+        categoryId: this.initialFilters.categoryId,
+      });
+    }
+
     this.loadTasks(); // Load initial tasks
   }
 

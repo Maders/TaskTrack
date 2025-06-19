@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { TaskListComponent } from '../../components/task-list/task-list.component';
 
 @Component({
@@ -8,7 +9,7 @@ import { TaskListComponent } from '../../components/task-list/task-list.componen
   imports: [CommonModule, TaskListComponent],
   template: `
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <app-task-list></app-task-list>
+      <app-task-list [initialFilters]="initialFilters"></app-task-list>
     </div>
   `,
   styles: [
@@ -19,4 +20,16 @@ import { TaskListComponent } from '../../components/task-list/task-list.componen
     `,
   ],
 })
-export class TaskListPageComponent {}
+export class TaskListPageComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
+  initialFilters: { categoryId?: string } = {};
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['categoryId']) {
+        this.initialFilters = { categoryId: params['categoryId'] };
+      }
+    });
+  }
+}

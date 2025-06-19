@@ -19,6 +19,11 @@ interface CategoryListResponse {
   };
 }
 
+interface CategoryDeletionResponse {
+  message: string;
+  affectedTasksCount: number;
+}
+
 export interface CategoryFilters {
   title?: string;
 }
@@ -115,13 +120,22 @@ export class CategoryService {
   }
 
   // Delete a category
-  deleteCategory(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      tap(() => {
-        const currentCategories = this.categoriesSubject.value;
-        const filteredCategories = currentCategories.filter((c) => c.id !== id);
-        this.categoriesSubject.next(filteredCategories);
-      })
-    );
+  deleteCategory(id: string): Observable<CategoryDeletionResponse> {
+    return this.http
+      .delete<CategoryDeletionResponse>(`${this.apiUrl}/${id}`)
+      .pipe(
+        tap(() => {
+          const currentCategories = this.categoriesSubject.value;
+          const filteredCategories = currentCategories.filter(
+            (c) => c.id !== id
+          );
+          this.categoriesSubject.next(filteredCategories);
+        })
+      );
+  }
+
+  // Get task counts by category
+  getTaskCountsByCategory(): Observable<Record<string, number>> {
+    return this.http.get<Record<string, number>>(`${this.apiUrl}/task-counts`);
   }
 }

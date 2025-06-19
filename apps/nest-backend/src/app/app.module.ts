@@ -3,10 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TasksModule } from '../tasks/tasks.module';
 import { CategoriesModule } from '../categories/categories.module';
+import { DatabaseModule } from './database.module';
+import { AppSeederService } from './app-seeder.service';
 
 @Module({
-  imports: [TasksModule, CategoriesModule],
+  imports: [DatabaseModule, TasksModule, CategoriesModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppSeederService],
 })
 export class AppModule {}

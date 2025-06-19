@@ -1,22 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AbstractCategoryRepository } from './interfaces/category.repository.interface';
 import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Injectable()
-export class CategorySeederService implements OnModuleInit {
+export class CategorySeederService {
   constructor(
     private readonly categoryRepository: AbstractCategoryRepository
   ) {}
-
-  async onModuleInit() {
-    await this.seed();
-  }
 
   async seed(): Promise<void> {
     try {
       // Check if categories already exist
       const existingCategories = this.categoryRepository.findAll();
-      if (existingCategories.categories.length > 0) {
+      if (existingCategories.length > 0) {
         console.log('Categories already exist, skipping seeding...');
         return;
       }

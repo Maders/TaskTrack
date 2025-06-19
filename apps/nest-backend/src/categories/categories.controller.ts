@@ -88,6 +88,20 @@ export class CategoriesController {
     return this.categoriesService.findAll(filters, sorting, pagination);
   }
 
+  @Get('task-counts')
+  @ApiOperation({ summary: 'Get task counts by category' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return task counts for each category.',
+    schema: {
+      type: 'object',
+      additionalProperties: { type: 'number' },
+    },
+  })
+  getTaskCounts() {
+    return this.categoriesService.getTaskCountsByCategory();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a category by id' })
   @ApiParam({ name: 'id', description: 'The id of the category' })
@@ -126,6 +140,13 @@ export class CategoriesController {
   @ApiResponse({
     status: 200,
     description: 'The category has been successfully deleted.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        affectedTasksCount: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Category not found.' })
   remove(@Param('id') id: string) {
